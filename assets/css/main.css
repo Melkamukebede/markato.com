@@ -1,0 +1,132 @@
+
+:root {
+    /* Brand Colors */
+    --amazon-dark: #131921;
+    --amazon-mid: #232f3e;
+    --amazon-light: #37475a;
+    --amazon-orange: #febd69;
+    --amazon-yellow: #f3a847;
+    --amazon-light-orange: #fad38b;
+    
+    /* Accent Colors */
+    --amazon-red: #b12704;
+    --amazon-green: #067d62;
+    --amazon-blue: #007185;
+    --prime-blue: #00a8e1;
+    --star-gold: #faaf00;
+    
+    /* Neutral Colors */
+    --bg-light: #eaeded;
+    --bg-white: #ffffff;
+    --border-light: #e8e8e8;
+    --text-primary: #0f1111;
+    --text-secondary: #565959;
+    --text-muted: #888888;
+    
+    /* Spacing */
+    --header-height: 60px;
+    --subnav-height: 39px;
+    
+    /* Shadows */
+    --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.12);
+    --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.15);
+    --shadow-lg: 0 8px 25px rgba(0, 0, 0, 0.2);
+    
+    /* Border Radius */
+    --radius-sm: 4px;
+    --radius-md: 8px;
+    --radius-lg: 12px;
+    --radius-xl: 20px;
+    
+    /* Transitions */
+    --transition-fast: 0.2s ease;
+    --transition-normal: 0.3s ease;
+    --transition-slow: 0.5s ease;
+}
+
+/* 
+   GLOBAL RESET & BASE STYLES */
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+html {
+    scroll-behavior: smooth;
+}
+
+body {
+    font-family: 'Segoe UI', 'Amazon Ember', -apple-system, BlinkMacSystemFont, Arial, sans-serif;
+    background: var(--bg-light);
+    color: var(--text-primary);
+    line-height: 1.6;
+    overflow-x: hidden;
+    min-height: 100vh;
+}
+
+a {
+    text-decoration: none;
+    color: inherit;
+    transition: var(--transition-fast);
+}
+
+a:hover {
+    text-decoration: none;
+}
+
+img {
+    max-width: 100%;
+    height: auto;
+}
+
+/* ============================================
+   TOP HEADER
+   ============================================ */
+.header-top {
+    background: var(--amazon-dark);
+    color: #ffffff;
+    padding: 8px 0;
+    position: sticky;
+    top: 0;
+    z-index: 1030;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+    min-height: var(--header-height);
+}
+
+.header-top .navbar {
+    padding: 0;
+}
+
+/* Logo */
+.logo-brand {
+    font-size: 1.6rem;
+    font-weight: 800;
+    color: #ffffff !important;
+    text-decoration: none;
+    letter-spacing: -0.5px;
+    white-space: nowrap;
+    transition: var(--transition-fast);
+    display: inline-block;
+    padding: 4px 8px;
+    border-radius: var(--radius-sm);
+    border: 1px solid transparent;
+}
+
+.logo-brand:hover {
+    color: var(--amazon-orange) !important;
+    transform: scale(1.03);
+    border-color: #ffffff;
+}
+
+.logo-brand .dot {
+    color: var(--amazon-orange);
+}
+
+/* Deliver To */
+.deliver-to {
+    font-size: 0.7rem;
+    color: #cccccc;
+    line-height: 1.2;
+    white-space: nowrap;
+   
