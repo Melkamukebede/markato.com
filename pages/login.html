@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Sign in to your ShopMart account">
+    <title>ShopMart - Sign In</title>
+    
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
+    
+    <style>
+        :root {
+            --amazon-dark: #131921;
+            --amazon-orange: #febd69;
+            --amazon-yellow: #f3a847;
+        }
+        
+        * {
+            box-sizing: border-box;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #eaeded 0%, #d5dbdb 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+            font-family: 'Segoe UI', 'Amazon Ember', Arial, sans-serif;
+        }
+        
+        .login-container {
+            width: 100%;
+            max-width: 380px;
+        }
+        
+        .login-card {
+            background: #ffffff;
+            border-radius: 12px;
+            padding: 30px 25px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
+            border: 1px solid #e0e0e0;
+        }
+        
+        .logo-brand {
+            font-size: 2rem;
+            font-weight: 800;
+            color: var(--amazon-dark);
+            text-decoration: none;
+            text-align: center;
+            display: block;
+            margin-bottom: 25px;
+            letter-spacing: -0.5px;
+        }
+        
+        .logo-brand .dot {
+            color: var(--amazon-orange);
+        }
+        
+        .login-card h4 {
+            font-weight: 600;
+            margin-bottom: 20px;
+            color: #0f1111;
+        }
+        
+        .form-label {
+            font-weight: 600;
+            font-size: 0.85rem;
+            color: #0f1111;
+            margin-bottom: 4px;
+        }
+        
+        .form-control {
+            border: 1.5px solid #a6a6a6;
+            border-radius: 4px;
+            padding: 10px 12px;
+            font-size: 0.9rem;
+            transition: all 0.2s ease;
+        }
+        
+        .form-control:focus {
+            border-color: var(--amazon-orange);
+            box-shadow: 0 0 0 3px rgba(254, 189, 105, 0.3);
+            outline: none;
+        }
+        
+        .btn-signin {
+            background: var(--amazon-orange);
+            border: none;
+            font-weight: 600;
+            padding: 10px;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            transition: all 0.2s ease;
+            color: #1a1a1a;
+            width: 100%;
+        }
+        
+        .btn-signin:hover {
+            background: var(--amazon-yellow);
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.15);
+        }
+        
+        .btn-signin:active {
+            transform: scale(0.98);
+        }
+        
+        .btn-create {
+            background: #ffffff;
+            border: 1.5px solid #d0d0d0;
+            font-weight: 500;
+            padding: 10px;
+            border-radius: 8px;
+            font-size: 0.85rem;
+            transition: all 0.2s ease;
+            width: 100%;
+            color: #0f1111;
+        }
+        
+        .btn-create:hover {
+            background: #f7f7f7;
+            border-color: #a0a0a0;
+        }
+        
+        .divider {
+            display: flex;
+            align-items: center;
+            text-align: center;
+            margin: 20px 0;
+            color: #767676;
+            font-size: 0.8rem;
+        }
+        
+        .divider::before,
+        .divider::after {
+            content: '';
+            flex: 1;
+            border-bottom: 1px solid #e0e0e0;
+        }
+        
+        .divider span {
+            padding: 0 15px;
+        }
+        
+        .forgot-password {
+            color: #0066c0;
+            text-decoration: none;
+            font-size: 0.85rem;
+            font-weight: 500;
+        }
+        
+        .forgot-password:hover {
+            color: #c45500;
+            text-decoration: underline;
+        }
+        
+        .terms-text {
+            font-size: 0.75rem;
+            color: #555555;
+            line-height: 1.5;
+        }
+        
+        .terms-text a {
+            color: #0066c0;
+            text-decoration: none;
+        }
+        
+        .terms-text a:hover {
+            text-decoration: underline;
+        }
+        
+        .footer-links {
+            text-align: center;
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 1px solid #e0e0e0;
+        }
+        
+        .footer-links a {
+            color: #0066c0;
+            text-decoration: none;
+            font-size: 0.8rem;
+            margin: 0 10px;
+        }
+        
+        .footer-links a:hover {
+            text-decoration: underline;
+            color: #c45500;
+        }
+        
+        .copyright {
+            text-align: center;
+            color: #888888;
+            font-size: 0.75rem;
+            margin-top: 15px;
+        }
+        
+        /* Responsive */
+        @media (max-width: 480px) {
+            .login-card {
+                padding: 20px 16px;
+            }
+            
+            .logo-brand {
+                font-size: 1.6rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="login-container">
+        <!-- Logo -->
+        <a href="../index.html" class="logo-brand">
+            shop<span class="dot">.</span>mart
+        </a>
+        
+        <!-- Login Form -->
+        <div class="login-card">
+            <h4>Sign in</h4>
+            
+            <form onsubmit="return false;">
+                <!-- Email/Phone Input -->
+                <div class="mb-3">
+                    <label for="email" class="form-label">Email or mobile phone number</label>
+                    <input type="text" class="form-control" id="email" placeholder="Enter email or phone" required autocomplete="email">
+                </div>
+                
+                <!-- Password Input -->
+                <div class="mb-3">
+                    <label for="password" class="form-label">Password</label>
+                    <input type="password" class="form-control" id="password" placeholder="Enter password" required autocomplete="current-password">
+                </div>
+                
+                <!-- Sign In Button -->
+                <button type="submit" class="btn btn-signin mb-3">
+                    Sign in
+                </button>
+                
+                <!-- Terms Text -->
+                <p class="terms-text mb-3">
+                    By continuing, you agree to ShopMart's 
+                    <a href="#">Conditions of Use</a> and 
+                    <a href="#">Privacy Notice</a>.
+                </p>
+                
+                <!-- Keep Signed In Checkbox -->
+                <div class="form-check mb-3">
+                    <input class="form-check-input" type="checkbox" id="keepSignedIn" checked>
+                    <label class="form-check-label" for="keepSignedIn" style="font-size:0.85rem;">
+                        Keep me signed in
+                    </label>
+                </div>
+                
+                <!-- Forgot Password -->
+                <div class="mb-3">
+                    <a href="#" class="forgot-password">
+                        <i class="bi bi-question-circle me-1"></i> Forgot your password?
+                    </a>
+                </div>
+                
+                <!-- Help Link -->
+                <div class="mb-3">
+                    <a href="#" class="forgot-password">
+                        <i class="bi bi-info-circle me-1"></i> Need help?
+                    </a>
+                </div>
+            </form>
+            
+            <!-- Divider -->
+            <div class="divider">
+                <span>New to ShopMart?</span>
+            </div>
+            
+            <!-- Create Account Button -->
+            <button type="button" class="btn btn-create">
+                Create your ShopMart account
+            </button>
+        </div>
+        
+        <!-- Footer Links -->
+        <div class="footer-links">
+            <a href="#">Conditions of Use</a>
+            <a href="#">Privacy Notice</a>
+            <a href="#">Help</a>
+        </div>
+        
+        <p class="copyright">
+            © 1996-2024, ShopMart.com, Inc. or its affiliates
+        </p>
+    </div>
+    
+    <!-- Bootstrap JS Bundle -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
