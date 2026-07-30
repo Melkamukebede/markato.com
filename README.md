@@ -1,4 +1,4 @@
-#  ShopMart - Advanced E-Commerce Website
+#  Merkato.com - Advanced E-Commerce Website
 
 A professional, Amazon-inspired online shopping website built with HTML, CSS, and Bootstrap 5.
 
@@ -150,4 +150,4 @@ Or simply double-click the `index.html` file!
 
 ---
 
-⭐ **Star this repo** if you find it useful! Happy coding! 🚀
+⭐ **Star this repo** if you find it useful! Happy coding!
