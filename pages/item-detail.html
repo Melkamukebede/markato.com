@@ -1,0 +1,410 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Product detail page - Wireless Bluetooth Headphones Pro">
+    <title>Product Detail - Wireless Bluetooth Headphones Pro</title>
+    
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
+    
+    <style>
+        :root {
+            --amazon-orange: #febd69;
+            --amazon-yellow: #f3a847;
+            --amazon-red: #b12704;
+            --amazon-blue: #007185;
+            --star-gold: #faaf00;
+            --prime-blue: #00a8e1;
+        }
+        
+        * {
+            box-sizing: border-box;
+        }
+        
+        body {
+            background: #ffffff;
+            padding: 20px;
+            font-family: 'Segoe UI', 'Amazon Ember', Arial, sans-serif;
+            color: #0f1111;
+        }
+        
+        .product-img {
+            max-height: 400px;
+            width: 100%;
+            object-fit: contain;
+            background: #f9f9f9;
+            border-radius: 12px;
+            padding: 20px;
+            transition: transform 0.3s ease;
+        }
+        
+        .product-img:hover {
+            transform: scale(1.05);
+        }
+        
+        .product-title {
+            font-size: 1.3rem;
+            font-weight: 700;
+            margin-bottom: 10px;
+            line-height: 1.4;
+        }
+        
+        .rating-stars {
+            color: var(--star-gold);
+            font-size: 0.9rem;
+        }
+        
+        .rating-count {
+            color: var(--amazon-blue);
+            font-size: 0.85rem;
+            margin-left: 8px;
+            cursor: pointer;
+        }
+        
+        .rating-count:hover {
+            text-decoration: underline;
+            color: #c45500;
+        }
+        
+        .price-large {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: var(--amazon-red);
+            margin: 10px 0;
+        }
+        
+        .price-large .currency {
+            font-size: 1rem;
+            vertical-align: super;
+        }
+        
+        .mrp-price {
+            font-size: 1rem;
+            color: #888888;
+            text-decoration: line-through;
+            margin-left: 8px;
+        }
+        
+        .savings-badge {
+            background: #e8f5e9;
+            color: #2e7d32;
+            font-weight: 600;
+            font-size: 0.85rem;
+            padding: 4px 10px;
+            border-radius: 4px;
+            margin-left: 8px;
+        }
+        
+        .prime-badge {
+            background: var(--prime-blue);
+            color: #ffffff;
+            font-weight: 700;
+            font-size: 0.75rem;
+            padding: 4px 12px;
+            border-radius: 4px;
+            display: inline-block;
+            margin: 10px 0;
+        }
+        
+        .description {
+            font-size: 0.95rem;
+            line-height: 1.7;
+            color: #333333;
+            margin: 15px 0;
+        }
+        
+        .feature-list {
+            list-style: none;
+            padding: 0;
+            margin: 15px 0;
+        }
+        
+        .feature-list li {
+            padding: 8px 0;
+            border-bottom: 1px solid #f0f0f0;
+            font-size: 0.9rem;
+        }
+        
+        .feature-list li:last-child {
+            border-bottom: none;
+        }
+        
+        .feature-list i {
+            color: #2e7d32;
+            margin-right: 8px;
+            font-size: 1.1rem;
+        }
+        
+        .btn-add-to-cart {
+            background: var(--amazon-orange);
+            border: none;
+            color: #1a1a1a;
+            font-weight: 700;
+            padding: 12px 30px;
+            border-radius: 30px;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            width: 100%;
+            max-width: 300px;
+        }
+        
+        .btn-add-to-cart:hover {
+            background: var(--amazon-yellow);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            transform: translateY(-2px);
+        }
+        
+        .btn-add-to-cart:active {
+            transform: scale(0.96);
+        }
+        
+        .btn-buy-now {
+            background: #ffa41c;
+            border: none;
+            color: #1a1a1a;
+            font-weight: 700;
+            padding: 12px 30px;
+            border-radius: 30px;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            width: 100%;
+            max-width: 300px;
+        }
+        
+        .btn-buy-now:hover {
+            background: #fa8900;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        }
+        
+        .delivery-info {
+            background: #f0f8ff;
+            border-radius: 8px;
+            padding: 15px;
+            margin: 15px 0;
+        }
+        
+        .delivery-info i {
+            color: var(--amazon-blue);
+        }
+        
+        .quantity-selector {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin: 15px 0;
+        }
+        
+        .quantity-selector select {
+            width: 80px;
+            padding: 8px 12px;
+            border-radius: 8px;
+            border: 1.5px solid #d0d0d0;
+            font-weight: 600;
+            background: #f0f0f0;
+        }
+        
+        .stock-status {
+            color: #2e7d32;
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+        
+        .stock-status.in-stock::before {
+            content: '● ';
+            color: #2e7d32;
+        }
+        
+        /* Responsive */
+        @media (max-width: 768px) {
+            body {
+                padding: 10px;
+            }
+            
+            .product-img {
+                max-height: 250px;
+                padding: 10px;
+            }
+            
+            .product-title {
+                font-size: 1.1rem;
+            }
+            
+            .price-large {
+                font-size: 1.5rem;
+            }
+            
+            .btn-add-to-cart,
+            .btn-buy-now {
+                max-width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container-fluid">
+        <div class="row g-4">
+            <!-- Product Image Column -->
+            <div class="col-md-5 text-center">
+                <img src="https://picsum.photos/seed/headphones/600/600" 
+                     class="product-img img-fluid" 
+                     alt="Wireless Bluetooth Headphones Pro"
+                     onerror="this.src='https://via.placeholder.com/600x600/f9f9f9/888?text=Product+Image'">
+                
+                <!-- Thumbnail Gallery -->
+                <div class="d-flex justify-content-center gap-2 mt-3">
+                    <img src="https://picsum.photos/seed/headphones/100/100" 
+                         class="rounded border" 
+                         style="width:60px;height:60px;object-fit:cover;cursor:pointer;" 
+                         alt="Thumbnail 1">
+                    <img src="https://picsum.photos/seed/headphones2/100/100" 
+                         class="rounded border" 
+                         style="width:60px;height:60px;object-fit:cover;cursor:pointer;" 
+                         alt="Thumbnail 2">
+                    <img src="https://picsum.photos/seed/headphones3/100/100" 
+                         class="rounded border" 
+                         style="width:60px;height:60px;object-fit:cover;cursor:pointer;" 
+                         alt="Thumbnail 3">
+                </div>
+            </div>
+            
+            <!-- Product Details Column -->
+            <div class="col-md-7">
+                <!-- Product Title -->
+                <h1 class="product-title">Wireless Bluetooth Headphones Pro - Active Noise Cancellation</h1>
+                
+                <!-- Rating -->
+                <div class="mb-2">
+                    <span class="rating-stars">
+                        <i class="bi bi-star-fill"></i>
+                        <i class="bi bi-star-fill"></i>
+                        <i class="bi bi-star-fill"></i>
+                        <i class="bi bi-star-fill"></i>
+                        <i class="bi bi-star-half"></i>
+                    </span>
+                    <span class="rating-count">
+                        4.5 out of 5 stars | 2,847 ratings
+                    </span>
+                </div>
+                
+                <hr>
+                
+                <!-- Price Section -->
+                <div class="mb-3">
+                    <span class="price-large">
+                        <span class="currency">$</span>799.99
+                    </span>
+                    <span class="mrp-price">1999.99</span>
+                    <span class="savings-badge">Save 38%</span>
+                </div>
+                
+                <!-- Prime Badge -->
+                <div class="prime-badge">
+                    <i class="bi bi-check-circle me-1"></i> PRIME ELIGIBLE
+                </div>
+                
+                <!-- Stock Status -->
+                <p class="stock-status in-stock mt-2">In Stock</p>
+                
+                <!-- Description -->
+                <p class="description">
+                    Premium noise-cancelling wireless headphones with 40-hour battery life, 
+                    deep bass, and comfortable over-ear design. Perfect for music lovers and 
+                    professionals who demand the best audio experience.
+                </p>
+                
+                <!-- Key Features -->
+                <ul class="feature-list">
+                    <li>
+                        <i class="bi bi-check-circle-fill"></i>
+                        <strong>Active Noise Cancellation</strong> - Blocks out background noise
+                    </li>
+                    <li>
+                        <i class="bi bi-check-circle-fill"></i>
+                        <strong>40-Hour Battery Life</strong> - All-day listening on a single charge
+                    </li>
+                    <li>
+                        <i class="bi bi-check-circle-fill"></i>
+                        <strong>Bluetooth 5.3</strong> - Stable, low-latency wireless connection
+                    </li>
+                    <li>
+                        <i class="bi bi-check-circle-fill"></i>
+                        <strong>Built-in Microphone</strong> - Crystal clear calls
+                    </li>
+                    <li>
+                        <i class="bi bi-check-circle-fill"></i>
+                        <strong>Foldable Design</strong> - Easy to carry and store
+                    </li>
+                </ul>
+                
+                <!-- Quantity Selector -->
+                <div class="quantity-selector">
+                    <label class="fw-bold">Quantity:</label>
+                    <select class="form-select" style="width:auto;">
+                        <option value="1">1</option>
+                        <option value="2">2</option>
+                        <option value="3">3</option>
+                        <option value="4">4</option>
+                        <option value="5">5</option>
+                    </select>
+                </div>
+                
+                <!-- Action Buttons -->
+                <div class="d-flex flex-wrap gap-2 mt-3">
+                    <button class="btn-add-to-cart">
+                        <i class="bi bi-cart-plus me-2"></i> Add to Cart
+                    </button>
+                    <button class="btn-buy-now">
+                        <i class="bi bi-lightning-fill me-2"></i> Buy Now
+                    </button>
+                </div>
+                
+                <!-- Delivery Information -->
+                <div class="delivery-info mt-3">
+                    <div class="d-flex align-items-start gap-2">
+                        <i class="bi bi-truck fs-5"></i>
+                        <div>
+                            <strong>FREE Delivery</strong> on orders over $25
+                            <br>
+                            <small class="text-muted">Delivery by Tomorrow, if ordered within 2 hrs 30 mins</small>
+                        </div>
+                    </div>
+                    <div class="d-flex align-items-start gap-2 mt-2">
+                        <i class="bi bi-arrow-counterclockwise fs-5"></i>
+                        <div>
+                            <strong>30-Day Easy Returns</strong>
+                            <br>
+                            <small class="text-muted">Return policy applies</small>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Share Buttons -->
+                <div class="mt-3">
+                    <small class="text-muted me-2">Share:</small>
+                    <a href="#" class="text-decoration-none me-2" title="Share on Facebook">
+                        <i class="bi bi-facebook fs-5"></i>
+                    </a>
+                    <a href="#" class="text-decoration-none me-2" title="Share on Twitter">
+                        <i class="bi bi-twitter fs-5"></i>
+                    </a>
+                    <a href="#" class="text-decoration-none me-2" title="Share on Pinterest">
+                        <i class="bi bi-pinterest fs-5"></i>
+                    </a>
+                    <a href="#" class="text-decoration-none" title="Copy Link">
+                        <i class="bi bi-link-45deg fs-5"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Bootstrap JS Bundle -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
