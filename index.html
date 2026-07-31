@@ -5,38 +5,178 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="ShopMart - Your one-stop online shopping destination for electronics, clothing, home & kitchen, books, and beauty products.">
     <meta name="keywords" content="online shopping, ecommerce, electronics, clothing, home kitchen, books, beauty">
-    <title>Merkato shoping - Online Shopping for Electronics, Clothing & More</title>
+    <title>ShopMart - Online Shopping for Electronics, Clothing & More</title>
+    
+    <!-- Bootstrap 5 CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
+    <!-- Custom CSS -->
     <link rel="stylesheet" href="assets/css/main.css">
+    
+    <!-- Additional styles for cart offcanvas (Day 2) -->
+    <style>
+        .cart-offcanvas {
+            width: 400px !important;
+            max-width: 95vw;
+        }
+        .cart-item {
+            display: flex;
+            gap: 14px;
+            padding: 14px 0;
+            border-bottom: 1px solid #eee;
+            align-items: flex-start;
+        }
+        .cart-item img {
+            width: 70px;
+            height: 70px;
+            object-fit: contain;
+            border-radius: 6px;
+            background: #f7f7f7;
+            padding: 4px;
+            flex-shrink: 0;
+        }
+        .cart-item .item-details {
+            flex: 1;
+            min-width: 0;
+        }
+        .cart-item .item-title {
+            font-size: 0.85rem;
+            font-weight: 600;
+            margin-bottom: 4px;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+        .cart-item .item-price {
+            font-weight: 700;
+            color: var(--amazon-red, #b12704);
+        }
+        .qty-control {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            margin-top: 6px;
+        }
+        .qty-control button {
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            border: 1px solid #ccc;
+            background: #f0f0f0;
+            cursor: pointer;
+            font-weight: 700;
+        }
+        .qty-control button:hover { background: #ddd; }
+        .btn-remove {
+            background: none;
+            border: none;
+            color: #cc0c39;
+            font-size: 0.75rem;
+            cursor: pointer;
+            padding: 0;
+            margin-top: 4px;
+            font-weight: 600;
+        }
+        .btn-remove:hover { text-decoration: underline; }
+        .cart-subtotal {
+            font-size: 1.2rem;
+            font-weight: 700;
+            padding: 14px 0;
+            text-align: right;
+            border-top: 2px solid #ddd;
+            margin-top: 10px;
+        }
+        .btn-checkout {
+            background: var(--amazon-orange, #febd69);
+            border: none;
+            color: #1a1a1a;
+            font-weight: 700;
+            padding: 14px;
+            border-radius: 8px;
+            font-size: 1rem;
+            cursor: pointer;
+            width: 100%;
+        }
+        .btn-checkout:hover { background: #f3a847; }
+        .empty-cart-msg {
+            text-align: center;
+            padding: 50px 20px;
+            color: #888;
+        }
+        .empty-cart-msg i { font-size: 4rem; opacity: 0.4; }
+        .toast-container {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            z-index: 9999;
+        }
+        .toast-custom {
+            background: #fff;
+            border-left: 5px solid #067d62;
+            border-radius: 8px;
+            box-shadow: 0 8px 30px rgba(0,0,0,0.2);
+            font-weight: 600;
+            font-size: 0.9rem;
+            padding: 14px 18px;
+            margin-bottom: 8px;
+        }
+        /* Wishlist liked state */
+        .wishlist-icon.liked {
+            color: #e74c3c !important;
+            border-color: #e74c3c !important;
+            background: #fff5f5 !important;
+        }
+        .discount-badge {
+            position: absolute;
+            top: 12px;
+            right: 12px;
+            background: #b12704;
+            color: #fff;
+            font-size: 0.7rem;
+            font-weight: 700;
+            padding: 4px 8px;
+            border-radius: 4px;
+            z-index: 2;
+        }
+    </style>
 </head>
 <body>
+    <!-- ==================== TOP HEADER ==================== -->
     <header class="header-top">
         <div class="container-fluid px-3">
             <div class="d-flex align-items-center gap-2 flex-wrap">
+                <!-- Logo -->
                 <a href="index.html" class="logo-brand">
-                    Merkato<span class="dot">.</span>com
+                    shop<span class="dot">.</span>mart
                 </a>
+
+                <!-- Deliver To (static) -->
                 <div class="deliver-to d-none d-lg-block">
                     <span>Deliver to</span>
-                    <span class="location-line"><i class="bi bi-geo-alt-fill"></i> Wolaita Sodo 10001</span>
+                    <span class="location-line"><i class="bi bi-geo-alt-fill"></i> New York 10001</span>
                 </div>
-                <form class="search-form mx-2" onsubmit="return false;">
+
+                <!-- Search Bar -->
+                <form class="search-form mx-2" id="searchForm" onsubmit="return false;">
                     <div class="input-group">
-                        <select class="form-select" aria-label="Search category">
-                            <option selected>All Departments</option>
-                            <option>Electronics</option>
-                            <option>Clothing</option>
-                            <option>Home & Kitchen</option>
-                            <option>Books</option>
-                            <option>Beauty</option>
+                        <select id="searchCategory">
+                            <option value="all">All Departments</option>
+                            <option value="electronics">Electronics</option>
+                            <option value="clothing">Clothing</option>
+                            <option value="home-kitchen">Home & Kitchen</option>
+                            <option value="books">Books</option>
+                            <option value="beauty">Beauty</option>
                         </select>
-                        <input type="text" class="form-control" placeholder="Search ShopMart" aria-label="Search products">
-                        <button class="btn-search" type="button" aria-label="Search">
+                        <input type="text" id="searchInput" placeholder="Search products...">
+                        <button class="btn-search" type="button" id="searchBtn">
                             <i class="bi bi-search"></i>
                         </button>
                     </div>
                 </form>
+
+                <!-- Language Selector -->
                 <div class="dropdown d-none d-lg-block">
                     <button class="btn btn-link header-link dropdown-toggle" type="button" data-bs-toggle="dropdown">
                         <i class="bi bi-globe"></i>
@@ -44,55 +184,58 @@
                     </button>
                     <ul class="dropdown-menu dropdown-menu-dark">
                         <li><a class="dropdown-item" href="#">English - EN</a></li>
-                        <li><a class="dropdown-item" href="#">Amaharic - AM</a></li>
-                        <li><a class="dropdown-item" href="#">Oromifa - ORO</a></li>
-                        <li><a class="dropdown-item" href="#">Wolaitigna - Wol</a></li>
+                        <li><a class="dropdown-item" href="#">Español - ES</a></li>
+                        <li><a class="dropdown-item" href="#">Français - FR</a></li>
+                        <li><a class="dropdown-item" href="#">Deutsch - DE</a></li>
                     </ul>
                 </div>
+
+                <!-- Account link -->
                 <a href="pages/login.html" class="header-link d-none d-md-inline-block">
                     Hello, Guest
                     <span class="link-title">Account & Lists <i class="bi bi-chevron-down" style="font-size:0.6rem;"></i></span>
                 </a>
+
+                <!-- Orders link -->
                 <a href="#" class="header-link d-none d-md-inline-block">
                     Returns
                     <span class="link-title">& Orders</span>
                 </a>
-                <a href="#" class="cart-btn">
+
+                <!-- Cart Button -->
+                <button class="cart-btn" id="cartToggleBtn">
                     <i class="bi bi-cart3"></i>
-                    <span class="cart-badge">0</span>
+                    <span class="cart-badge" id="cartBadge">0</span>
                     <span class="cart-text d-none d-lg-inline">Cart</span>
-                </a>
+                </button>
             </div>
         </div>
     </header>
 
-    <!-- SUB NAVIGATION  -->
+    <!-- ==================== SUB NAVIGATION ==================== -->
     <nav class="sub-nav">
         <div class="container-fluid px-3">
             <div class="d-flex gap-1 flex-nowrap" style="overflow-x:auto;">
-                <a href="#" class="nav-link active">
+                <a href="#" class="nav-link active category-link" data-category="all">
                     <i class="bi bi-fire"></i> Today's Deals
                 </a>
-                <a href="#" class="nav-link">
+                <a href="#" class="nav-link category-link" data-category="electronics">
                     <i class="bi bi-phone"></i> Electronics
                 </a>
-                <a href="#" class="nav-link">
+                <a href="#" class="nav-link category-link" data-category="clothing">
                     <i class="bi bi-handbag"></i> Clothing
                 </a>
-                <a href="#" class="nav-link">
+                <a href="#" class="nav-link category-link" data-category="home-kitchen">
                     <i class="bi bi-house"></i> Home & Kitchen
                 </a>
-                <a href="#" class="nav-link">
+                <a href="#" class="nav-link category-link" data-category="books">
                     <i class="bi bi-book"></i> Books
                 </a>
-                <a href="#" class="nav-link">
+                <a href="#" class="nav-link category-link" data-category="beauty">
                     <i class="bi bi-palette"></i> Beauty
                 </a>
                 <a href="#" class="nav-link">
                     <i class="bi bi-gift"></i> Gift Cards
-                </a>
-                <a href="#" class="nav-link">
-                    <i class="bi bi-tags"></i> Clearance
                 </a>
                 <a href="pages/payment.html" class="nav-link">
                     <i class="bi bi-credit-card"></i> Payment Methods
@@ -101,14 +244,14 @@
         </div>
     </nav>
 
-    <!-- HERO BANNER  -->
+    <!-- ==================== HERO BANNER ==================== -->
     <section class="hero-banner">
         <div class="container">
             <span class="badge bg-danger mb-3">LIMITED TIME OFFER</span>
-            <h1> Mega Sale is LIVE!</h1>
-            <p class="lead">Up to <strong>60% off</strong> on top brands. Free shipping on orders over 250 birr.</p>
+            <h1>🚀 Mega Sale is LIVE!</h1>
+            <p class="lead">Up to <strong>60% off</strong> on top brands. Free shipping on orders over $25.</p>
             <div class="d-flex justify-content-center gap-3 flex-wrap">
-                <a href="#trending-deals" class="btn-cta"> Shop Now</a>
+                <a href="#trending-deals" class="btn-cta">🛍️ Shop Now</a>
                 <a href="#" class="btn btn-outline-light rounded-pill px-4">Learn More</a>
             </div>
             <div class="mt-4 d-flex justify-content-center gap-4 flex-wrap">
@@ -128,406 +271,84 @@
         </div>
     </section>
 
-    <!--  FEATURED CATEGORIES -->
+    <!-- ==================== FEATURED CATEGORIES ==================== -->
     <section class="container my-5">
-        <h2 class="section-title">Shop by Category</h2>
+        <h2 class="section-title">🛍️ Shop by Category</h2>
         <div class="row g-3">
             <div class="col-6 col-md-3 col-lg-2">
-                <a href="#" class="category-card">
-                    <div class="category-icon">
-                        <i class="bi bi-phone"></i>
-                    </div>
+                <a href="#" class="category-card category-link" data-category="electronics">
+                    <div class="category-icon"><i class="bi bi-phone"></i></div>
                     <h6>Electronics</h6>
                 </a>
             </div>
             <div class="col-6 col-md-3 col-lg-2">
-                <a href="#" class="category-card">
-                    <div class="category-icon">
-                        <i class="bi bi-handbag"></i>
-                    </div>
+                <a href="#" class="category-card category-link" data-category="clothing">
+                    <div class="category-icon"><i class="bi bi-handbag"></i></div>
                     <h6>Clothing</h6>
                 </a>
             </div>
             <div class="col-6 col-md-3 col-lg-2">
-                <a href="#" class="category-card">
-                    <div class="category-icon">
-                        <i class="bi bi-house"></i>
-                    </div>
+                <a href="#" class="category-card category-link" data-category="home-kitchen">
+                    <div class="category-icon"><i class="bi bi-house"></i></div>
                     <h6>Home & Kitchen</h6>
                 </a>
             </div>
             <div class="col-6 col-md-3 col-lg-2">
-                <a href="#" class="category-card">
-                    <div class="category-icon">
-                        <i class="bi bi-book"></i>
-                    </div>
+                <a href="#" class="category-card category-link" data-category="books">
+                    <div class="category-icon"><i class="bi bi-book"></i></div>
                     <h6>Books</h6>
                 </a>
             </div>
             <div class="col-6 col-md-3 col-lg-2">
-                <a href="#" class="category-card">
-                    <div class="category-icon">
-                        <i class="bi bi-palette"></i>
-                    </div>
+                <a href="#" class="category-card category-link" data-category="beauty">
+                    <div class="category-icon"><i class="bi bi-palette"></i></div>
                     <h6>Beauty</h6>
                 </a>
             </div>
             <div class="col-6 col-md-3 col-lg-2">
                 <a href="#" class="category-card">
-                    <div class="category-icon">
-                        <i class="bi bi-controller"></i>
-                    </div>
+                    <div class="category-icon"><i class="bi bi-controller"></i></div>
                     <h6>Gaming</h6>
                 </a>
             </div>
         </div>
     </section>
 
-    <!--IFRAME PRODUCT DETAIL PREVIEW  -->
-    <section class="container my-5">
-        <div class="iframe-preview">
-            <div class="bg-light p-3 border-bottom d-flex justify-content-between align-items-center">
-                <h5 class="mb-0">
-                    <i class="bi bi-box-arrow-in-down-right me-2"></i>
-                    Featured Product Preview
-                </h5>
-                <a href="pages/item-detail.html" target="_blank" class="btn btn-sm btn-outline-primary">
-                    Open Full Page <i class="bi bi-box-arrow-up-right"></i>
-                </a>
-            </div>
-            <iframe src="pages/item-detail.html" title="Product Detail Preview" loading="lazy" sandbox="allow-same-origin allow-scripts"></iframe>
-        </div>
-    </section>
-
-    <!--  TRENDING DEALS SECTION  -->
+    <!-- ==================== PRODUCTS GRID (Dynamic - rendered by JS) ==================== -->
     <main class="container my-5" id="trending-deals">
-        <div class="d-flex justify-content-between align-items-center mb-4">
-            <h2 class="section-title">Trending Deals</h2>
-            <div class="d-flex gap-2">
-                <button class="btn btn-outline-secondary btn-sm rounded-pill" disabled>
-                    <i class="bi bi-grid-fill"></i>
-                </button>
-                <button class="btn btn-outline-secondary btn-sm rounded-pill" disabled>
-                    <i class="bi bi-list-ul"></i>
-                </button>
-            </div>
+        <h2 class="section-title">🔥 Trending Deals</h2>
+        <div class="row g-3" id="productGrid">
+            <!-- Products will be rendered here by JavaScript -->
         </div>
-        <div class="row g-3">
-            <!-- Product 1 -->
-            <div class="col-xl-3 col-lg-4 col-md-6 col-sm-6">
-                <div class="product-card">
-                    <div class="img-wrapper">
-                        <span class="prime-badge">PRIME</span>
-                        <span class="wishlist-icon" title="Add to Wishlist">
-                            <i class="bi bi-heart"></i>
-                        </span>
-                        <span class="discount-badge">-38%</span>
-                        <img src="https://picsum.photos/seed/headphones/400/400" alt="Wireless Bluetooth Headphones Pro" loading="lazy" onerror="this.src='https://via.placeholder.com/400x400/f7f7f7/888?text=No+Image'">
-                    </div>
-                    <div class="card-body">
-                        <div class="product-title" title="Wireless Bluetooth Headphones Pro">Wireless Bluetooth Headphones Pro</div>
-                        <div class="rating">
-                            <i class="bi bi-star-fill"></i>
-                            <i class="bi bi-star-fill"></i>
-                            <i class="bi bi-star-fill"></i>
-                            <i class="bi bi-star-fill"></i>
-                            <i class="bi bi-star-half"></i>
-                            <span class="count">2,847</span>
-                        </div>
-                        <div class="price-wrapper">
-                            <span class="price">799.99</span>
-                            <span class="mrp">1299.99</span>
-                        </div>
-                        <div class="delivery-info">
-                            <i class="bi bi-truck"></i> FREE Delivery
-                        </div>
-                        <button class="btn-add-cart">
-                            <i class="bi bi-cart-plus me-1"></i> Add to Cart
-                        </button>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Product 2 -->
-            <div class="col-xl-3 col-lg-4 col-md-6 col-sm-6">
-                <div class="product-card">
-                    <div class="img-wrapper">
-                        <span class="prime-badge">PRIME</span>
-                        <span class="wishlist-icon" title="Add to Wishlist">
-                            <i class="bi bi-heart"></i>
-                        </span>
-                        <span class="discount-badge">-29%</span>
-                        <img src="https://picsum.photos/seed/smarttv/400/400" alt="4K Ultra HD Smart TV 55 inch" loading="lazy" onerror="this.src='https://via.placeholder.com/400x400/f7f7f7/888?text=No+Image'">
-                    </div>
-                    <div class="card-body">
-                        <div class="product-title" title="4K Ultra HD Smart TV 55 inch">4K Ultra HD Smart TV 55"</div>
-                        <div class="rating">
-                            <i class="bi bi-star-fill"></i>
-                            <i class="bi bi-star-fill"></i>
-                            <i class="bi bi-star-fill"></i>
-                            <i class="bi bi-star-fill"></i>
-                            <i class="bi bi-star"></i>
-                            <span class="count">1,523</span>
-                        </div>
-                        <div class="price-wrapper">
-                            <span class="price">5999.99</span>
-                            <span class="mrp">8499.99</span>
-                        </div>
-                        <div class="delivery-info">
-                            <i class="bi bi-truck"></i> FREE Delivery
-                        </div>
-                        <button class="btn-add-cart">
-                            <i class="bi bi-cart-plus me-1"></i> Add to Cart
-                        </button>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Product 3 -->
-            <div class="col-xl-3 col-lg-4 col-md-6 col-sm-6">
-                <div class="product-card">
-                    <div class="img-wrapper">
-                        <span class="wishlist-icon" title="Add to Wishlist">
-                            <i class="bi bi-heart"></i>
-                        </span>
-                        <span class="discount-badge">-24%</span>
-                        <img src="https://picsum.photos/seed/laptop/400/400" alt="Laptop Pro 15.6 inch 16GB RAM" loading="lazy" onerror="this.src='https://via.placeholder.com/400x400/f7f7f7/888?text=No+Image'">
-                    </div>
-                    <div class="card-body">
-                        <div class="product-title" title="Laptop Pro 15.6 inch 16GB RAM">Laptop Pro 15.6" 16GB RAM</div>
-                        <div class="rating">
-                            <i class="bi bi-star-fill"></i>
-                            <i class="bi bi-star-fill"></i>
-                            <i class="bi bi-star-fill"></i>
-                            <i class="bi bi-star-fill"></i>
-                            <i class="bi bi-star-fill"></i>
-                            <span class="count">987</span>
-                        </div>
-                        <div class="price-wrapper">
-                            <span class="price">69999.99 birr</span>
-                            <span class="mrp">59,999.99 birr</span>
-                        </div>
-                        <div class="delivery-info text-muted">
-                            <i class="bi bi-truck"></i> 49.99 birr Delivery
-                        </div>
-                        <button class="btn-add-cart">
-                            <i class="bi bi-cart-plus me-1"></i> Add to Cart
-                        </button>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Product 4 -->
-            <div class="col-xl-3 col-lg-4 col-md-6 col-sm-6">
-                <div class="product-card">
-                    <div class="img-wrapper">
-                        <span class="prime-badge">PRIME</span>
-                        <span class="wishlist-icon" title="Add to Wishlist">
-                            <i class="bi bi-heart"></i>
-                        </span>
-                        <span class="discount-badge">-18%</span>
-                        <img src="https://picsum.photos/seed/smartphone/400/400" alt="Smartphone X Pro 5G" loading="lazy" onerror="this.src='https://via.placeholder.com/400x400/f7f7f7/888?text=No+Image'">
-                    </div>
-                    <div class="card-body">
-                        <div class="product-title" title="Smartphone X Pro 5G">Smartphone X Pro 5G</div>
-                        <div class="rating">
-                            <i class="bi bi-star-fill"></i>
-                            <i class="bi bi-star-fill"></i>
-                            <i class="bi bi-star-fill"></i>
-                            <i class="bi bi-star-fill"></i>
-                            <i class="bi bi-star-half"></i>
-                            <span class="count">3,456</span>
-                        </div>
-                        <div class="price-wrapper">
-                            <span class="price">2999.99 birr</span>
-                            <span class="mrp">39,999.99 birr</span>
-                        </div>
-                        <div class="delivery-info">
-                            <i class="bi bi-truck"></i> FREE Delivery
-                        </div>
-                        <button class="btn-add-cart">
-                            <i class="bi bi-cart-plus me-1"></i> Add to Cart
-                        </button>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Product 5 -->
-            <div class="col-xl-3 col-lg-4 col-md-6 col-sm-6">
-                <div class="product-card">
-                    <div class="img-wrapper">
-                        <span class="wishlist-icon" title="Add to Wishlist">
-                            <i class="bi bi-heart"></i>
-                        </span>
-                        <span class="discount-badge">-38%</span>
-                        <img src="https://picsum.photos/seed/jeans/400/400" alt="Casual Denim Jeans Slim Fit" loading="lazy" onerror="this.src='https://via.placeholder.com/400x400/f7f7f7/888?text=No+Image'">
-                    </div>
-                    <div class="card-body">
-                        <div class="product-title" title="Casual Denim Jeans Slim Fit">Casual Denim Jeans Slim Fit</div>
-                        <div class="rating">
-                            <i class="bi bi-star-fill"></i>
-                            <i class="bi bi-star-fill"></i>
-                            <i class="bi bi-star-fill"></i>
-                            <i class="bi bi-star"></i>
-                            <i class="bi bi-star"></i>
-                            <span class="count">3,456</span>
-                        </div>
-                        <div class="price-wrapper">
-                            <span class="price">499.99 birr</span>
-                            <span class="mrp">799.99 birr</span>
-                        </div>
-                        <div class="delivery-info">
-                            <i class="bi bi-truck"></i> FREE Delivery
-                        </div>
-                        <button class="btn-add-cart">
-                            <i class="bi bi-cart-plus me-1"></i> Add to Cart
-                        </button>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Product 6 -->
-            <div class="col-xl-3 col-lg-4 col-md-6 col-sm-6">
-                <div class="product-card">
-                    <div class="img-wrapper">
-                        <span class="prime-badge">PRIME</span>
-                        <span class="wishlist-icon" title="Add to Wishlist">
-                            <i class="bi bi-heart"></i>
-                        </span>
-                        <span class="discount-badge">-33%</span>
-                        <img src="https://picsum.photos/seed/coffeemaker/400/400" alt="Coffee Maker Machine 12-Cup" loading="lazy" onerror="this.src='https://via.placeholder.com/400x400/f7f7f7/888?text=No+Image'">
-                    </div>
-                    <div class="card-body">
-                        <div class="product-title" title="Coffee Maker Machine 12-Cup">Coffee Maker Machine 12-Cup</div>
-                        <div class="rating">
-                            <i class="bi bi-star-fill"></i>
-                            <i class="bi bi-star-fill"></i>
-                            <i class="bi bi-star-fill"></i>
-                            <i class="bi bi-star-fill"></i>
-                            <i class="bi bi-star-half"></i>
-                            <span class="count">2,678</span>
-                        </div>
-                        <div class="price-wrapper">
-                            <span class="price">799.99 birr</span>
-                            <span class="mrp">1199.99 birr</span>
-                        </div>
-                        <div class="delivery-info">
-                            <i class="bi bi-truck"></i> FREE Delivery
-                        </div>
-                        <button class="btn-add-cart">
-                            <i class="bi bi-cart-plus me-1"></i> Add to Cart
-                        </button>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Product 7 -->
-            <div class="col-xl-3 col-lg-4 col-md-6 col-sm-6">
-                <div class="product-card">
-                    <div class="img-wrapper">
-                        <span class="wishlist-icon" title="Add to Wishlist">
-                            <i class="bi bi-heart"></i>
-                        </span>
-                        <span class="discount-badge">-40%</span>
-                        <img src="https://picsum.photos/seed/novel/400/400" alt="Best Seller Novel 2024 Edition" loading="lazy" onerror="this.src='https://via.placeholder.com/400x400/f7f7f7/888?text=No+Image'">
-                    </div>
-                    <div class="card-body">
-                        <div class="product-title" title="Best Seller Novel 2024 Edition">Best Seller Novel 2018 edition</div>
-                        <div class="rating">
-                            <i class="bi bi-star-fill"></i>
-                            <i class="bi bi-star-fill"></i>
-                            <i class="bi bi-star-fill"></i>
-                            <i class="bi bi-star-fill"></i>
-                            <i class="bi bi-star-fill"></i>
-                            <span class="count">8,901</span>
-                        </div>
-                        <div class="price-wrapper">
-                            <span class="price">149.99</span>
-                            <span class="mrp">299.99 birr</span>
-                        </div>
-                        <div class="delivery-info">
-                            <i class="bi bi-truck"></i> FREE Delivery
-                        </div>
-                        <button class="btn-add-cart">
-                            <i class="bi bi-cart-plus me-1"></i> Add to Cart
-                        </button>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Product 8 -->
-            <div class="col-xl-3 col-lg-4 col-md-6 col-sm-6">
-                <div class="product-card">
-                    <div class="img-wrapper">
-                        <span class="prime-badge">PRIME</span>
-                        <span class="wishlist-icon" title="Add to Wishlist">
-                            <i class="bi bi-heart"></i>
-                        </span>
-                        <span class="discount-badge">-30%</span>
-                        <img src="https://picsum.photos/seed/runningshoes/400/400" alt="Women's Running Shoes Ultra" loading="lazy" onerror="this.src='https://via.placeholder.com/400x400/f7f7f7/888?text=No+Image'">
-                    </div>
-                    <div class="card-body">
-                        <div class="product-title" title="Women's Running Shoes Ultra">Women's Running Shoes Ultra</div>
-                        <div class="rating">
-                            <i class="bi bi-star-fill"></i>
-                            <i class="bi bi-star-fill"></i>
-                            <i class="bi bi-star-fill"></i>
-                            <i class="bi bi-star-fill"></i>
-                            <i class="bi bi-star-half"></i>
-                            <span class="count">2,100</span>
-                        </div>
-                        <div class="price-wrapper">
-                            <span class="price">8999.99</span>
-                            <span class="mrp">4999.99 birr</span>
-                        </div>
-                        <div class="delivery-info">
-                            <i class="bi bi-truck"></i> FREE Delivery
-                        </div>
-                        <button class="btn-add-cart">
-                            <i class="bi bi-cart-plus me-1"></i> Add to Cart
-                        </button>
-                    </div>
-                </div>
-            </div>
-        </div>
-        
-        <!-- Load More Button -->
-        <div class="text-center mt-4">
-            <button class="btn btn-outline-dark rounded-pill px-5" disabled>
-                Load More Products <i class="bi bi-arrow-down"></i>
-            </button>
+        <div id="noResults" class="text-center py-5 d-none">
+            <i class="bi bi-search" style="font-size:3rem;color:#ccc;"></i>
+            <h4 class="text-muted mt-3">No products found</h4>
+            <p class="text-muted">Try adjusting your search or filters</p>
+            <button class="btn btn-outline-dark rounded-pill px-4" id="clearFiltersBtn">Clear Filters</button>
         </div>
     </main>
 
-    <!-- FEATURES BAR  -->
+    <!-- ==================== FEATURES BAR ==================== -->
     <section class="features-bar">
         <div class="container">
             <div class="row text-center g-3">
                 <div class="col-md-3 col-6">
-                    <div class="feature-icon">
-                        <i class="bi bi-truck"></i>
-                    </div>
+                    <div class="feature-icon"><i class="bi bi-truck"></i></div>
                     <p class="fw-bold mb-0 mt-2">Free Shipping</p>
                     <small class="text-muted">On orders over $25</small>
                 </div>
                 <div class="col-md-3 col-6">
-                    <div class="feature-icon">
-                        <i class="bi bi-shield-check"></i>
-                    </div>
+                    <div class="feature-icon"><i class="bi bi-shield-check"></i></div>
                     <p class="fw-bold mb-0 mt-2">Secure Checkout</p>
                     <small class="text-muted">256-bit encryption</small>
                 </div>
                 <div class="col-md-3 col-6">
-                    <div class="feature-icon">
-                        <i class="bi bi-arrow-counterclockwise"></i>
-                    </div>
+                    <div class="feature-icon"><i class="bi bi-arrow-counterclockwise"></i></div>
                     <p class="fw-bold mb-0 mt-2">Easy Returns</p>
                     <small class="text-muted">30-day return policy</small>
                 </div>
                 <div class="col-md-3 col-6">
-                    <div class="feature-icon">
-                        <i class="bi bi-headset"></i>
-                    </div>
+                    <div class="feature-icon"><i class="bi bi-headset"></i></div>
                     <p class="fw-bold mb-0 mt-2">24/7 Support</p>
                     <small class="text-muted">We're here to help</small>
                 </div>
@@ -535,13 +356,13 @@
         </div>
     </section>
 
-    <!-- NEWSLETTER SECTION -->
+    <!-- ==================== NEWSLETTER SECTION ==================== -->
     <section class="newsletter-section">
         <div class="container">
             <div class="row justify-content-center">
                 <div class="col-md-8 col-lg-6">
-                    <h3>Subscribe to Our Newsletter</h3>
-                    <p class="text-muted">Get the latest deals and exclusive offers straight to your inbox.</p>
+                    <h3>📧 Subscribe to Our Newsletter</h3>
+                    <p class="text-white-50">Get the latest deals and exclusive offers straight to your inbox.</p>
                     <form class="d-flex gap-2" onsubmit="return false;">
                         <input type="email" class="form-control rounded-pill" placeholder="Enter your email" required>
                         <button class="btn btn-warning rounded-pill px-4 fw-bold" type="submit">Subscribe</button>
@@ -551,7 +372,7 @@
         </div>
     </section>
 
-    <!-- FOOTER  -->
+    <!-- ==================== FOOTER ==================== -->
     <footer class="footer-amazon">
         <div class="container">
             <div class="row g-4">
@@ -578,7 +399,6 @@
                     <a href="pages/payment.html"><i class="bi bi-google"></i> Google Pay</a>
                     <a href="pages/payment.html"><i class="bi bi-apple"></i> Apple Pay</a>
                     <a href="#">Gift Cards</a>
-                    <p>we will add more methods like Chappa, Tele Birr and related feuters</p>
                 </div>
                 <div class="col-md-3 col-6">
                     <h6>Let Us Help You</h6>
@@ -599,18 +419,55 @@
                     <a href="#" class="text-muted small">Privacy Notice</a>
                     <a href="#" class="text-muted small">Interest-Based Ads</a>
                 </div>
-              
+                <p class="mt-2 mb-0" style="font-size:0.8rem; color:#999;">
+                    © 2024 ShopMart. All rights reserved. This is a demo website for educational purposes.
+                </p>
             </div>
         </div>
     </footer>
 
-    <!--  BACK TO TOP BUTTON -->
+    <!-- ==================== BACK TO TOP BUTTON ==================== -->
     <a href="#" class="back-to-top" title="Back to top">
         <i class="bi bi-arrow-up"></i>
     </a>
 
-    <!-- Bootstrap JS Bundle (required for dropdowns, modals, etc.) -->
+    <!-- ==================== CART OFFCANVAS ==================== -->
+    <div class="offcanvas offcanvas-end cart-offcanvas" tabindex="-1" id="cartOffcanvas">
+        <div class="offcanvas-header">
+            <h5 class="offcanvas-title"><i class="bi bi-cart3 me-2"></i>Shopping Cart</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="offcanvas"></button>
+        </div>
+        <div class="offcanvas-body d-flex flex-column" id="cartBody">
+            <!-- Filled dynamically by JavaScript -->
+        </div>
+    </div>
+
+    <!-- ==================== PRODUCT MODAL ==================== -->
+    <div class="modal fade" id="productModal" tabindex="-1">
+        <div class="modal-dialog modal-lg modal-dialog-centered">
+            <div class="modal-content rounded-4 overflow-hidden">
+                <div class="modal-header bg-light">
+                    <h5 class="modal-title fw-bold" id="modalTitle">Product Details</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body" id="modalBody">
+                    <!-- Filled by JavaScript -->
+                </div>
+                <div class="modal-footer bg-light">
+                    <button type="button" class="btn btn-outline-secondary rounded-pill px-4" data-bs-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-warning rounded-pill px-4 fw-bold" id="modalAddToCart">Add to Cart</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Container -->
+    <div class="toast-container" id="toastContainer"></div>
+
+    <!-- Bootstrap JS Bundle -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- 🔥 ShopMart Application JavaScript (External File) -->
     <script src="assets/js/app.js"></script>
 </body>
 </html>
