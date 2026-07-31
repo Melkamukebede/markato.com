@@ -271,31 +271,7 @@
                 <button class="btn-social btn-google" id="googleLoginBtn">
                     <i class="bi bi-google"></i>
                     Continue with Google
-                </button>
-                
-                <!-- Facebook Login -->
-                <button class="btn-social btn-facebook" id="facebookLoginBtn">
-                    <i class="bi bi-facebook"></i>
-                    Continue with Facebook
-                </button>
-                
-                <!-- GitHub Login -->
-                <button class="btn-social btn-github" id="githubLoginBtn">
-                    <i class="bi bi-github"></i>
-                    Continue with GitHub
-                </button>
-                
-                <!-- Microsoft Login -->
-                <button class="btn-social btn-microsoft" id="microsoftLoginBtn">
-                    <i class="bi bi-microsoft"></i>
-                    Continue with Microsoft
-                </button>
-                
-                <!-- Twitter Login -->
-                <button class="btn-social btn-twitter" id="twitterLoginBtn">
-                    <i class="bi bi-twitter"></i>
-                    Continue with Twitter
-                </button>
+                </button>             
             </div>
             
             <!-- Create Account -->
@@ -314,7 +290,6 @@
             <a href="#" style="color:#0066c0;text-decoration:none;margin:0 10px;">Help</a>
         </div>
         <p class="text-center text-muted mt-2" style="font-size:0.75rem;">
-            © 2024 ShopMart. All rights reserved.
         </p>
     </div>
 
@@ -329,12 +304,12 @@
         // REPLACE WITH YOUR OWN FIREBASE CONFIG
         // ============================================
         const firebaseConfig = {
-            apiKey: "YOUR_API_KEY",
-            authDomain: "YOUR_PROJECT.firebaseapp.com",
-            projectId: "YOUR_PROJECT_ID",
-            storageBucket: "YOUR_PROJECT.appspot.com",
-            messagingSenderId: "YOUR_SENDER_ID",
-            appId: "YOUR_APP_ID"
+            apiKey: "AIzaSyBcOtdDpV037fBF1kJfWF3YCRkHcRALGKY",
+            authDomain: "merkato-auth-bf886.firebaseapp.com",
+            projectId: "merkato-auth-bf886",
+            storageBucket: "merkato-auth-bf886.firebasestorage.app",
+            messagingSenderId: "246848063321",
+              appId: "1:246848063321:web:1a5e717a1156bffec6ae48"
         };
         
         // Initialize Firebase
@@ -350,31 +325,6 @@
             const provider = new firebase.auth.GoogleAuthProvider();
             socialLogin(provider);
         });
-        
-        // Facebook Login
-        document.getElementById('facebookLoginBtn').addEventListener('click', () => {
-            const provider = new firebase.auth.FacebookAuthProvider();
-            socialLogin(provider);
-        });
-        
-        // GitHub Login
-        document.getElementById('githubLoginBtn').addEventListener('click', () => {
-            const provider = new firebase.auth.GithubAuthProvider();
-            socialLogin(provider);
-        });
-        
-        // Microsoft Login
-        document.getElementById('microsoftLoginBtn').addEventListener('click', () => {
-            const provider = new firebase.auth.OAuthProvider('microsoft.com');
-            socialLogin(provider);
-        });
-        
-        // Twitter Login
-        document.getElementById('twitterLoginBtn').addEventListener('click', () => {
-            const provider = new firebase.auth.TwitterAuthProvider();
-            socialLogin(provider);
-        });
-        
         // Generic Social Login Handler
         function socialLogin(provider) {
             auth.signInWithPopup(provider)
