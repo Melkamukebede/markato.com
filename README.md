@@ -139,17 +139,15 @@ Or simply double-click the `index.html` file!
 
 ##  Author
 
-**Your Name**
+** Melkamu Kebede** 
 - GitHub: [@Melkamukebede](https://github.com/Melkamukebede)
-- Email: your.melkamukebede11@gmail.com
+- Email: melkamukebede11@gmail.com
 
 ##  Acknowledgments
 
 - [Bootstrap](https://getbootstrap.com/) for the amazing CSS framework
 - [Bootstrap Icons](https://icons.getbootstrap.com/) for the icon library
 - [Lorem Picsum](https://picsum.photos/) for placeholder images
-- Amazon.com for design inspiration
-
 ---
 
 ⭐ **Star this repo** if you find it useful! Happy coding!
