@@ -1,5 +1,4 @@
-// ==========================================
-// ShopMart - Main Application JavaScript
+
 // Day 2: Cart, dynamic products, wishlist, modal
 // ==========================================
 
