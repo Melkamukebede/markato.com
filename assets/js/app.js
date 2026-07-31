@@ -1,9 +1,8 @@
 
 // Day 2: Cart, dynamic products, wishlist, modal
-// ==========================================
 
 (function() {
-    // ========== PRODUCT DATA ==========
+    // PRODUCT DATA  
     const products = [
         { id: 1, name: 'Wireless Bluetooth Headphones Pro', category: 'electronics', price: 79.99, mrp: 129.99, rating: 4.5, reviews: 2847, prime: true, image: 'https://picsum.photos/seed/headphones/400/400', desc: 'Premium noise-cancelling wireless headphones with 40-hour battery life.' },
         { id: 2, name: '4K Ultra HD Smart TV 55"', category: 'electronics', price: 599.99, mrp: 849.99, rating: 4.7, reviews: 1523, prime: true, image: 'https://picsum.photos/seed/smarttv/400/400', desc: 'Stunning 4K with HDR10+, built-in apps.' },
@@ -27,14 +26,14 @@
         { id: 20, name: 'Smart Watch Fitness Tracker', category: 'electronics', price: 199.99, mrp: 279.99, rating: 4.6, reviews: 7890, prime: true, image: 'https://picsum.photos/seed/smartwatch/400/400', desc: 'GPS, heart rate, 7-day battery.' }
     ];
 
-    // ========== STATE ==========
+    //STATE
     let cart = JSON.parse(localStorage.getItem('shopmart_cart')) || [];
     let wishlist = JSON.parse(localStorage.getItem('shopmart_wishlist')) || [];
     let currentCategory = 'all';
     let currentSearch = '';
     let currentModalProductId = null;
 
-    // ========== DOM ELEMENTS ==========
+    //DOM ELEMENTS
     const productGrid = document.getElementById('productGrid');
     const cartBadge = document.getElementById('cartBadge');
     const cartBody = document.getElementById('cartBody');
@@ -48,7 +47,7 @@
     const modalAddToCart = document.getElementById('modalAddToCart');
     const cartOffcanvas = new bootstrap.Offcanvas(document.getElementById('cartOffcanvas'));
 
-    // ========== RENDER PRODUCTS ==========
+    // RENDER PRODUCT
     function getFilteredProducts() {
         let filtered = products.filter(p => {
             const matchCategory = currentCategory === 'all' || p.category === currentCategory;
