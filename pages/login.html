@@ -19,6 +19,8 @@
         
         * {
             box-sizing: border-box;
+            margin: 0;
+            padding: 0;
         }
         
         body {
@@ -27,7 +29,6 @@
             align-items: center;
             justify-content: center;
             min-height: 100vh;
-            margin: 0;
             padding: 20px;
             font-family: 'Segoe UI', 'Amazon Ember', Arial, sans-serif;
         }
@@ -91,12 +92,13 @@
             background: var(--amazon-orange);
             border: none;
             font-weight: 600;
-            padding: 10px;
+            padding: 12px;
             border-radius: 8px;
             font-size: 0.9rem;
             transition: all 0.2s ease;
             color: #1a1a1a;
             width: 100%;
+            cursor: pointer;
         }
         
         .btn-signin:hover {
@@ -104,11 +106,11 @@
             box-shadow: 0 3px 10px rgba(0, 0, 0, 0.15);
         }
         
-        /* Social  */
-        .social-login-section {
-            margin-top: 20px;
+        .btn-signin:active {
+            transform: scale(0.98);
         }
         
+        /* Social Login Buttons */
         .divider {
             display: flex;
             align-items: center;
@@ -145,12 +147,14 @@
             transition: all 0.2s ease;
             margin-bottom: 10px;
             color: #333;
+            text-decoration: none;
         }
         
         .btn-social:hover {
             background: #f7f7f7;
             border-color: #a0a0a0;
             box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            transform: translateY(-1px);
         }
         
         .btn-google {
@@ -202,16 +206,46 @@
             font-size: 1.2rem;
         }
         
-        /* User Profile Dropdown (in main page) */
-        .user-menu {
-            position: relative;
+        .alert {
+            padding: 10px 15px;
+            border-radius: 6px;
+            margin-bottom: 15px;
+            font-size: 0.85rem;
+            display: none;
         }
         
-        .user-avatar {
-            width: 32px;
-            height: 32px;
-            border-radius: 50%;
-            object-fit: cover;
+        .alert-danger {
+            background: #fce4e4;
+            color: #cc0c39;
+            border: 1px solid #f5c6cb;
+        }
+        
+        .alert-success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        
+        .forgot-password {
+            color: #0066c0;
+            text-decoration: none;
+            font-size: 0.85rem;
+        }
+        
+        .forgot-password:hover {
+            color: #c45500;
+            text-decoration: underline;
+        }
+        
+        .create-account-link {
+            color: #0066c0;
+            text-decoration: none;
+            font-weight: 500;
+        }
+        
+        .create-account-link:hover {
+            color: #c45500;
+            text-decoration: underline;
         }
         
         /* Responsive */
@@ -237,23 +271,38 @@
         <div class="login-card">
             <h4>Sign in</h4>
             
+            <!-- Alert Messages -->
+            <div class="alert alert-danger" id="errorAlert"></div>
+            <div class="alert alert-success" id="successAlert"></div>
+            
             <!-- Email/Password Form -->
-            <form id="loginForm" onsubmit="return false;">
+            <form id="loginForm" onsubmit="return handleLogin(event);">
                 <div class="mb-3">
                     <label for="email" class="form-label">Email or mobile phone number</label>
-                    <input type="email" class="form-control" id="email" placeholder="Enter email" required>
+                    <input type="email" class="form-control" id="email" placeholder="demo@shopmart.com" required>
+                    <small class="text-muted">Demo: use any email (e.g., demo@shopmart.com)</small>
                 </div>
                 
                 <div class="mb-3">
                     <label for="password" class="form-label">Password</label>
                     <input type="password" class="form-control" id="password" placeholder="Enter password" required>
+                    <small class="text-muted">Demo: use any password (min 6 characters)</small>
                 </div>
                 
-                <button type="submit" class="btn btn-signin mb-3" id="signInBtn">
+                <button type="submit" class="btn btn-signin mb-3">
                     Sign in
                 </button>
                 
-                <p class="terms-text mb-3" style="font-size:0.75rem;color:#555;">
+                <div class="d-flex justify-content-between mb-3">
+                    <a href="#" class="forgot-password">
+                        <i class="bi bi-question-circle me-1"></i> Forgot password?
+                    </a>
+                    <a href="#" class="forgot-password">
+                        <i class="bi bi-info-circle me-1"></i> Need help?
+                    </a>
+                </div>
+                
+                <p style="font-size:0.75rem;color:#555;line-height:1.5;">
                     By continuing, you agree to ShopMart's 
                     <a href="#" style="color:#0066c0;">Conditions of Use</a> and 
                     <a href="#" style="color:#0066c0;">Privacy Notice</a>.
@@ -265,22 +314,48 @@
                 <span>or sign in with</span>
             </div>
             
-            <!-- Social Login Buttons -->
+            <!-- Social Login Buttons (Demo - Simulated) -->
             <div class="social-login-section">
-                <!-- Google Login -->
-                <button class="btn-social btn-google" id="googleLoginBtn">
+                <!-- Google -->
+                <button class="btn-social btn-google" onclick="handleSocialLogin('Google')">
                     <i class="bi bi-google"></i>
                     Continue with Google
-                </button>             
+                </button>
+                
+                <!-- Facebook -->
+                <button class="btn-social btn-facebook" onclick="handleSocialLogin('Facebook')">
+                    <i class="bi bi-facebook"></i>
+                    Continue with Facebook
+                </button>
+                
+                <!-- GitHub -->
+                <button class="btn-social btn-github" onclick="handleSocialLogin('GitHub')">
+                    <i class="bi bi-github"></i>
+                    Continue with GitHub
+                </button>
+                
+                <!-- Microsoft -->
+                <button class="btn-social btn-microsoft" onclick="handleSocialLogin('Microsoft')">
+                    <i class="bi bi-microsoft"></i>
+                    Continue with Microsoft
+                </button>
+                
+                <!-- Twitter -->
+                <button class="btn-social btn-twitter" onclick="handleSocialLogin('Twitter')">
+                    <i class="bi bi-twitter-x"></i>
+                    Continue with Twitter
+                </button>
             </div>
             
             <!-- Create Account -->
             <div class="divider mt-4">
                 <span>New to ShopMart?</span>
             </div>
-            <button type="button" class="btn btn-outline-secondary w-100 rounded-3" onclick="alert('Create account feature coming soon!')">
-                Create your ShopMart account
-            </button>
+            <div class="text-center">
+                <a href="#" class="create-account-link" onclick="handleCreateAccount()">
+                    Create your ShopMart account
+                </a>
+            </div>
         </div>
         
         <!-- Footer Links -->
@@ -290,106 +365,170 @@
             <a href="#" style="color:#0066c0;text-decoration:none;margin:0 10px;">Help</a>
         </div>
         <p class="text-center text-muted mt-2" style="font-size:0.75rem;">
+            © 2024 ShopMart. All rights reserved. Demo site.
         </p>
     </div>
 
-    <!-- Firebase SDK -->
-    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
     
     <!-- Login Logic -->
     <script>
         // ============================================
-        // Firebase Configuration
-        // REPLACE WITH YOUR OWN FIREBASE CONFIG
-        // ============================================
-        const firebaseConfig = {
-            apiKey: "AIzaSyBcOtdDpV037fBF1kJfWF3YCRkHcRALGKY",
-            authDomain: "merkato-auth-bf886.firebaseapp.com",
-            projectId: "merkato-auth-bf886",
-            storageBucket: "merkato-auth-bf886.firebasestorage.app",
-            messagingSenderId: "246848063321",
-              appId: "1:246848063321:web:1a5e717a1156bffec6ae48"
-        };
-        
-        // Initialize Firebase
-        firebase.initializeApp(firebaseConfig);
-        const auth = firebase.auth();
-        
-        // ============================================
-        // Social Login Functions
+        // Demo Authentication (Works without Firebase)
         // ============================================
         
-        // Google Login
-        document.getElementById('googleLoginBtn').addEventListener('click', () => {
-            const provider = new firebase.auth.GoogleAuthProvider();
-            socialLogin(provider);
-        });
-        // Generic Social Login Handler
-        function socialLogin(provider) {
-            auth.signInWithPopup(provider)
-                .then((result) => {
-                    // User signed in successfully
-                    const user = result.user;
-                    console.log('✅ Login successful:', user);
-                    
-                    // Save user data to localStorage
-                    const userData = {
-                        uid: user.uid,
-                        displayName: user.displayName,
-                        email: user.email,
-                        photoURL: user.photoURL,
-                        provider: result.providerId,
-                        lastLogin: new Date().toISOString()
-                    };
-                    localStorage.setItem('shopmart_user', JSON.stringify(userData));
-                    
-                    // Redirect to main page
-                    alert(`Welcome, ${user.displayName}! 🎉`);
-                    window.location.href = '../index.html';
-                })
-                .catch((error) => {
-                    console.error('❌ Login failed:', error);
-                    alert(`Login failed: ${error.message}`);
-                });
+        // Handle Email/Password Login
+        function handleLogin(event) {
+            event.preventDefault();
+            
+            const email = document.getElementById('email').value.trim();
+            const password = document.getElementById('password').value.trim();
+            const errorAlert = document.getElementById('errorAlert');
+            const successAlert = document.getElementById('successAlert');
+            
+            // Hide alerts
+            errorAlert.style.display = 'none';
+            successAlert.style.display = 'none';
+            
+            // Validation
+            if (!email) {
+                showError('Please enter your email address');
+                return false;
+            }
+            
+            if (!password) {
+                showError('Please enter your password');
+                return false;
+            }
+            
+            if (password.length < 6) {
+                showError('Password must be at least 6 characters');
+                return false;
+            }
+            
+            // Simulate login (in real app, this would call Firebase/API)
+            simulateLogin(email, password, 'email');
+            return false;
         }
         
-        // Email/Password Login (Demo)
-        document.getElementById('signInBtn').addEventListener('click', () => {
-            const email = document.getElementById('email').value;
-            const password = document.getElementById('password').value;
+        // Handle Social Login (Demo)
+        function handleSocialLogin(provider) {
+            const demoEmails = {
+                'Google': 'demo@gmail.com',
+                'Facebook': 'demo@facebook.com',
+                'GitHub': 'demo@github.com',
+                'Microsoft': 'demo@outlook.com',
+                'Twitter': 'demo@twitter.com'
+            };
             
-            if (email && password) {
-                // Demo: Simple validation
-                if (password.length < 6) {
-                    alert('Password must be at least 6 characters');
-                    return;
-                }
-                
-                // In production, use: auth.signInWithEmailAndPassword(email, password)
-                const demoUser = {
-                    uid: 'demo_' + Date.now(),
-                    displayName: email.split('@')[0],
-                    email: email,
-                    photoURL: null,
-                    provider: 'password',
-                    lastLogin: new Date().toISOString()
-                };
-                localStorage.setItem('shopmart_user', JSON.stringify(demoUser));
-                
-                alert(`Welcome, ${demoUser.displayName}! 🎉\n(Demo mode - Firebase not configured)`);
-                window.location.href = '../index.html';
+            const email = demoEmails[provider] || `demo@${provider.toLowerCase()}.com`;
+            const name = `Demo ${provider} User`;
+            
+            simulateLogin(email, 'social123', provider.toLowerCase(), name);
+        }
+        
+        // Handle Create Account
+        function handleCreateAccount() {
+            const email = prompt('Enter your email to create an account:');
+            if (email) {
+                simulateLogin(email, 'newuser123', 'email', email.split('@')[0]);
             }
-        });
+        }
+        
+        // Core Login Function
+        function simulateLogin(email, password, provider, displayName = null) {
+            // Show loading state
+            const signInBtn = document.getElementById('signInBtn');
+            if (signInBtn) {
+                signInBtn.disabled = true;
+                signInBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Signing in...';
+            }
+            
+            // Simulate network delay
+            setTimeout(() => {
+                // Create user object
+                const userData = {
+                    uid: 'user_' + Date.now(),
+                    displayName: displayName || email.split('@')[0],
+                    email: email,
+                    photoURL: getProviderIcon(provider),
+                    provider: provider,
+                    lastLogin: new Date().toISOString(),
+                    isLoggedIn: true
+                };
+                
+                // Save to localStorage
+                localStorage.setItem('shopmart_user', JSON.stringify(userData));
+                
+                // Show success
+                showSuccess(`Welcome, ${userData.displayName}! 🎉`);
+                
+                // Redirect to home page after short delay
+                setTimeout(() => {
+                    window.location.href = '../index.html';
+                }, 1000);
+                
+            }, 800);
+        }
+        
+        // Get provider icon URL
+        function getProviderIcon(provider) {
+            const icons = {
+                'google': 'https://img.icons8.com/color/48/google-logo.png',
+                'facebook': 'https://img.icons8.com/color/48/facebook.png',
+                'github': 'https://img.icons8.com/ios-glyphs/48/github.png',
+                'microsoft': 'https://img.icons8.com/color/48/microsoft.png',
+                'twitter': 'https://img.icons8.com/color/48/twitter.png',
+                'email': null
+            };
+            return icons[provider] || null;
+        }
+        
+        // UI Helper Functions
+        function showError(message) {
+            const errorAlert = document.getElementById('errorAlert');
+            errorAlert.textContent = message;
+            errorAlert.style.display = 'block';
+            
+            // Hide after 5 seconds
+            setTimeout(() => {
+                errorAlert.style.display = 'none';
+            }, 5000);
+        }
+        
+        function showSuccess(message) {
+            const successAlert = document.getElementById('successAlert');
+            successAlert.textContent = message;
+            successAlert.style.display = 'block';
+            
+            // Hide after 5 seconds
+            setTimeout(() => {
+                successAlert.style.display = 'none';
+            }, 5000);
+        }
         
         // Check if already logged in
         window.addEventListener('DOMContentLoaded', () => {
             const user = localStorage.getItem('shopmart_user');
             if (user) {
                 const userData = JSON.parse(user);
-                console.log('👤 User already logged in:', userData.displayName);
+                console.log('👤 Already logged in as:', userData.displayName);
+                
+                // Optionally redirect if already logged in
+                // window.location.href = '../index.html';
             }
         });
+        
+        // Allow Enter key to submit
+        document.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter' && document.activeElement.tagName === 'INPUT') {
+                handleLogin(e);
+            }
+        });
+        
+        console.log('✅ Login page ready (Demo mode - no Firebase required)');
+        console.log('💡 Use any email and password (min 6 chars) to login');
     </script>
 </body>
 </html>
