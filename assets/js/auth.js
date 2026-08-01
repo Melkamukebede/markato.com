@@ -1,3 +1,8 @@
+// ============================================
+// ShopMart - Authentication System (Day 3)
+// Complete user management with session handling
+// ============================================
+
 class AuthSystem {
     constructor() {
         this.currentUser = null;
