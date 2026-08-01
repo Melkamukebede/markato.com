@@ -9,7 +9,7 @@ A professional, Amazon-inspired online shopping website built with HTML, CSS, an
 | Day | Focus | Status |
 |-----|-------|--------|
 | **Day 1** | Structure & Styling (HTML/CSS only) | ✅ Complete |
-| **Day 2** | JavaScript Interactivity & Cart |  Coming Soon |
+| **Day 2** | JavaScript Interactivity & Cart |  ✅ Complete|
 | **Day 3** | User Authentication & Login |  Coming Soon |
 | **Day 4** | Checkout & Payment Integration |  Coming Soon |
 | **Day 5** | Polish, Animations & Final Touches |  Coming Soon |
