@@ -1,0 +1,40 @@
+{
+  "users": [
+    {
+      "id": "user_001",
+      "email": "lemu34@gmail.com",
+      "password": "password123",
+      "displayName": "Lemu Kifile",
+      "phone": "+2519-567-8900",
+      "address": "123 Wolaita, Sodo, NY 10001",
+      "avatar": "https://i.pravatar.cc/150?img=68",
+      "joinedDate": "2024-01-15",
+      "orders": ["ORD001", "ORD002"],
+      "wishlist": [1, 5, 10]
+    },
+    {
+      "id": "user_002",
+      "email": "jane@gmail.com",
+      "password": "password123",
+      "displayName": "Talo lako",
+      "phone": "+25194-567-8901",
+      "address": "456 sidama, Hawasa, CA 90001",
+      "avatar": "https://i.pravatar.cc/150?img=47",
+      "joinedDate": "2024-02-20",
+      "orders": ["ORD003"],
+      "wishlist": [3, 7, 15]
+    },
+    {
+      "id": "user_003",
+      "email": "demoze@shopmart.com",
+      "password": "demo123",
+      "displayName": "Demoze Tariku",
+      "phone": "+2519 4-567-8902",
+      "address": "789 Broadway, Chicago, IL 60601",
+      "avatar": "https://i.pravatar.cc/150?img=12",
+      "joinedDate": "2024-03-10",
+      "orders": [],
+      "wishlist": [2, 8, 14]
+    }
+  ]
+}
