@@ -1,427 +1,299 @@
-// ============================================
-// ShopMart - Authentication System (Day 3)
-// Complete user management with session handling
-// ============================================
-
-class AuthSystem {
-    constructor() {
-        this.currentUser = null;
-        this.users = [];
-        this.init();
-    }
-
-    // Initialize auth system
-    async init() {
-        // Load users from JSON
-        await this.loadUsers();
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ShopMart - Create Account</title>
+    
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
+    
+    <style>
+        :root {
+            --amazon-dark: #131921;
+            --amazon-orange: #febd69;
+            --amazon-yellow: #f3a847;
+        }
         
-        // Check for existing session
-        this.checkSession();
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
         
-        // Update UI
-        this.updateHeaderUI();
+        body {
+            background: linear-gradient(135deg, #eaeded 0%, #d5dbdb 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            padding: 20px;
+            font-family: 'Segoe UI', 'Amazon Ember', Arial, sans-serif;
+        }
         
-        console.log('🔐 Auth System Initialized');
-        console.log('📝 Logged in:', this.isLoggedIn() ? 'Yes' : 'No');
-    }
-
-    // Load users from JSON file
-    async loadUsers() {
-        try {
-            const response = await fetch('data/users.json');
-            if (!response.ok) throw new Error('Failed to load users');
-            const data = await response.json();
-            this.users = data.users;
-            console.log(`👥 Loaded ${this.users.length} users`);
-        } catch (error) {
-            console.warn('Could not load users.json, using demo data');
-            // Fallback demo users
-            this.users = [
-                {
-                    id: 'user_demo',
-                    email: 'demo@shopmart.com',
-                    password: 'demo123',
-                    displayName: 'Demo User',
-                    avatar: null,
-                    joinedDate: new Date().toISOString(),
-                    orders: [],
-                    wishlist: []
-                }
-            ];
+        .signup-container {
+            width: 100%;
+            max-width: 420px;
         }
-    }
-
-    // Check if user has active session
-    checkSession() {
-        const sessionData = localStorage.getItem('shopmart_session');
-        if (sessionData) {
-            try {
-                const session = JSON.parse(sessionData);
-                // Verify session is not expired (24 hours)
-                const now = new Date().getTime();
-                const sessionAge = now - session.timestamp;
-                const maxAge = 24 * 60 * 60 * 1000; // 24 hours
-
-                if (sessionAge < maxAge) {
-                    this.currentUser = session.user;
-                    console.log('👤 Session restored for:', this.currentUser.displayName);
-                } else {
-                    // Session expired
-                    this.logout(true);
-                    console.log('⏰ Session expired, please login again');
-                }
-            } catch (error) {
-                this.logout(true);
-            }
-        }
-    }
-
-    // Login with email and password
-    async login(email, password) {
-        try {
-            // Find user by email
-            const user = this.users.find(u => u.email.toLowerCase() === email.toLowerCase());
-            
-            if (!user) {
-                throw new Error('No account found with this email address');
-            }
-
-            // Check password
-            if (user.password !== password) {
-                throw new Error('Incorrect password');
-            }
-
-            // Login successful
-            const userData = {
-                id: user.id,
-                email: user.email,
-                displayName: user.displayName,
-                avatar: user.avatar || null,
-                phone: user.phone || '',
-                address: user.address || '',
-                joinedDate: user.joinedDate,
-                wishlist: user.wishlist || []
-            };
-
-            // Save to current session
-            this.currentUser = userData;
-            
-            // Save session to localStorage
-            this.saveSession(userData);
-            
-            // Update UI
-            this.updateHeaderUI();
-            
-            // Sync wishlist with user's saved wishlist
-            this.syncWishlist(userData.wishlist);
-
-            return {
-                success: true,
-                message: `Welcome back, ${userData.displayName}!`,
-                user: userData
-            };
-
-        } catch (error) {
-            return {
-                success: false,
-                message: error.message
-            };
-        }
-    }
-
-    // Register new user
-    async signup(userData) {
-        try {
-            // Validate email
-            if (!this.isValidEmail(userData.email)) {
-                throw new Error('Please enter a valid email address');
-            }
-
-            // Check if email already exists
-            const existingUser = this.users.find(u => u.email.toLowerCase() === userData.email.toLowerCase());
-            if (existingUser) {
-                throw new Error('An account with this email already exists');
-            }
-
-            // Validate password
-            if (userData.password.length < 6) {
-                throw new Error('Password must be at least 6 characters');
-            }
-
-            // Create new user
-            const newUser = {
-                id: 'user_' + Date.now(),
-                email: userData.email,
-                password: userData.password,
-                displayName: userData.displayName || userData.email.split('@')[0],
-                phone: userData.phone || '',
-                address: userData.address || '',
-                avatar: null,
-                joinedDate: new Date().toISOString(),
-                orders: [],
-                wishlist: []
-            };
-
-            // Add to users array
-            this.users.push(newUser);
-
-            // Auto login after signup
-            const loginData = {
-                id: newUser.id,
-                email: newUser.email,
-                displayName: newUser.displayName,
-                avatar: null,
-                phone: newUser.phone,
-                address: newUser.address,
-                joinedDate: newUser.joinedDate,
-                wishlist: []
-            };
-
-            this.currentUser = loginData;
-            this.saveSession(loginData);
-            this.updateHeaderUI();
-
-            return {
-                success: true,
-                message: `Welcome to ShopMart, ${newUser.displayName}!`,
-                user: loginData
-            };
-
-        } catch (error) {
-            return {
-                success: false,
-                message: error.message
-            };
-        }
-    }
-
-    // Social login (simulated)
-    async socialLogin(provider) {
-        const demoUser = {
-            id: 'social_' + Date.now(),
-            email: `demo@${provider.toLowerCase()}.com`,
-            displayName: `${provider} User`,
-            avatar: this.getProviderIcon(provider),
-            phone: '',
-            address: '',
-            joinedDate: new Date().toISOString(),
-            wishlist: []
-        };
-
-        this.currentUser = demoUser;
-        this.saveSession(demoUser);
-        this.updateHeaderUI();
-
-        return {
-            success: true,
-            message: `Welcome, ${demoUser.displayName}!`,
-            user: demoUser
-        };
-    }
-
-    // Logout
-    logout(silent = false) {
-        this.currentUser = null;
-        localStorage.removeItem('shopmart_session');
-        this.updateHeaderUI();
         
-        if (!silent) {
-            alert('You have been logged out successfully.');
-            window.location.href = 'index.html';
+        .signup-card {
+            background: #ffffff;
+            border-radius: 12px;
+            padding: 30px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
+            border: 1px solid #e0e0e0;
         }
-    }
-
-    // Check if user is logged in
-    isLoggedIn() {
-        return this.currentUser !== null;
-    }
-
-    // Get current user
-    getCurrentUser() {
-        return this.currentUser;
-    }
-
-    // Save session to localStorage
-    saveSession(userData) {
-        const session = {
-            user: userData,
-            timestamp: new Date().getTime()
-        };
-        localStorage.setItem('shopmart_session', JSON.stringify(session));
-    }
-
-    // Update user profile
-    updateProfile(updates) {
-        if (!this.currentUser) return false;
-
-        // Update current user object
-        Object.assign(this.currentUser, updates);
         
-        // Update in users array
-        const userIndex = this.users.findIndex(u => u.id === this.currentUser.id);
-        if (userIndex !== -1) {
-            Object.assign(this.users[userIndex], updates);
+        .logo-brand {
+            font-size: 2rem;
+            font-weight: 800;
+            color: var(--amazon-dark);
+            text-decoration: none;
+            text-align: center;
+            display: block;
+            margin-bottom: 20px;
+            letter-spacing: -0.5px;
         }
-
-        // Save updated session
-        this.saveSession(this.currentUser);
-        this.updateHeaderUI();
-
-        return true;
-    }
-
-    // Sync wishlist with user account
-    syncWishlist(wishlistItems) {
-        if (wishlistItems && wishlistItems.length > 0) {
-            localStorage.setItem('shopmart_wishlist', JSON.stringify(wishlistItems));
-        }
-    }
-
-    // Update header UI
-    updateHeaderUI() {
-        const accountLinks = document.querySelectorAll('.header-link');
         
-        accountLinks.forEach(link => {
-            if (link.querySelector('.link-title') && 
-                (link.textContent.includes('Account') || link.textContent.includes('Sign In'))) {
-                
-                if (this.currentUser) {
-                    const avatar = this.currentUser.avatar 
-                        ? `<img src="${this.currentUser.avatar}" class="user-avatar-mini" style="width:24px;height:24px;border-radius:50%;margin-right:4px;vertical-align:middle;">` 
-                        : '<i class="bi bi-person-circle me-1"></i>';
-                    
-                    link.innerHTML = `
-                        Hello, ${this.currentUser.displayName.split(' ')[0]}
-                        <span class="link-title">
-                            ${avatar}
-                            Account & Lists 
-                            <i class="bi bi-chevron-down" style="font-size:0.6rem;"></i>
-                        </span>
-                    `;
-                    link.href = 'pages/account.html';
-                    link.onclick = null;
-                    
-                    // Add dropdown menu
-                    this.createAccountDropdown(link);
-                } else {
-                    link.innerHTML = `
-                        Hello, Sign in
-                        <span class="link-title">Account & Lists <i class="bi bi-chevron-down" style="font-size:0.6rem;"></i></span>
-                    `;
-                    link.href = 'pages/login.html';
-                    link.onclick = null;
-                }
-            }
-        });
-    }
-
-    // Create account dropdown menu
-    createAccountDropdown(linkElement) {
-        // Remove existing dropdown if any
-        const existingDropdown = document.querySelector('.account-dropdown');
-        if (existingDropdown) existingDropdown.remove();
-
-        // Create dropdown
-        const dropdown = document.createElement('div');
-        dropdown.className = 'account-dropdown';
-        dropdown.style.cssText = `
-            display: none;
-            position: absolute;
-            top: 100%;
-            right: 0;
-            background: white;
-            min-width: 200px;
-            box-shadow: 0 8px 25px rgba(0,0,0,0.2);
+        .logo-brand .dot { color: var(--amazon-orange); }
+        
+        .signup-card h4 {
+            font-weight: 600;
+            margin-bottom: 20px;
+            color: #0f1111;
+        }
+        
+        .form-label {
+            font-weight: 600;
+            font-size: 0.85rem;
+            color: #0f1111;
+            margin-bottom: 4px;
+        }
+        
+        .form-control {
+            border: 1.5px solid #a6a6a6;
+            border-radius: 6px;
+            padding: 10px 12px;
+            font-size: 0.9rem;
+            transition: all 0.2s ease;
+        }
+        
+        .form-control:focus {
+            border-color: var(--amazon-orange);
+            box-shadow: 0 0 0 3px rgba(254, 189, 105, 0.3);
+        }
+        
+        .btn-create {
+            background: var(--amazon-orange);
+            border: none;
+            font-weight: 600;
+            padding: 12px;
             border-radius: 8px;
-            z-index: 1000;
-            padding: 8px 0;
-        `;
-
-        dropdown.innerHTML = `
-            <div style="padding: 12px 16px; border-bottom: 1px solid #eee;">
-                <strong>${this.currentUser.displayName}</strong>
-                <br>
-                <small class="text-muted">${this.currentUser.email}</small>
-            </div>
-            <a href="pages/account.html" class="dropdown-item" style="display:block;padding:8px 16px;color:#333;text-decoration:none;">
-                <i class="bi bi-person me-2"></i> Your Account
-            </a>
-            <a href="pages/account.html#orders" class="dropdown-item" style="display:block;padding:8px 16px;color:#333;text-decoration:none;">
-                <i class="bi bi-box me-2"></i> Your Orders
-            </a>
-            <a href="#" class="dropdown-item" style="display:block;padding:8px 16px;color:#333;text-decoration:none;" onclick="event.preventDefault(); window.location.href='index.html'">
-                <i class="bi bi-heart me-2"></i> Wishlist
-            </a>
-            <div style="border-top: 1px solid #eee; margin-top: 8px; padding-top: 8px;">
-                <a href="#" class="dropdown-item text-danger" style="display:block;padding:8px 16px;text-decoration:none;" onclick="event.preventDefault(); authSystem.logout();">
-                    <i class="bi bi-box-arrow-right me-2"></i> Sign Out
+            font-size: 0.95rem;
+            transition: all 0.2s ease;
+            color: #1a1a1a;
+            width: 100%;
+            cursor: pointer;
+        }
+        
+        .btn-create:hover {
+            background: var(--amazon-yellow);
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.15);
+        }
+        
+        .btn-create:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+        
+        .alert {
+            padding: 12px 16px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            font-size: 0.85rem;
+            display: none;
+        }
+        
+        .alert-danger { background: #fce4e4; color: #cc0c39; border: 1px solid #f5c6cb; }
+        .alert-success { background: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
+        
+        .signin-link {
+            color: #0066c0;
+            text-decoration: none;
+            font-weight: 500;
+        }
+        
+        .signin-link:hover { color: #c45500; text-decoration: underline; }
+        
+        .password-strength {
+            height: 4px;
+            border-radius: 2px;
+            margin-top: 5px;
+            transition: all 0.3s;
+        }
+        
+        .strength-weak { background: #ff4444; width: 33%; }
+        .strength-medium { background: #ffbb33; width: 66%; }
+        .strength-strong { background: #00C851; width: 100%; }
+        
+        @media (max-width: 480px) {
+            .signup-card { padding: 20px 16px; }
+        }
+    </style>
+</head>
+<body>
+    <div class="signup-container">
+        <a href="../index.html" class="logo-brand">
+            shop<span class="dot">.</span>mart
+        </a>
+        
+        <div class="signup-card">
+            <h4>Create account</h4>
+            
+            <div class="alert alert-danger" id="errorAlert"></div>
+            <div class="alert alert-success" id="successAlert"></div>
+            
+            <form id="signupForm">
+                <div class="mb-3">
+                    <label for="name" class="form-label">Your name</label>
+                    <input type="text" class="form-control" id="name" 
+                           placeholder="First and last name" required>
+                </div>
+                
+                <div class="mb-3">
+                    <label for="email" class="form-label">Email</label>
+                    <input type="email" class="form-control" id="email" 
+                           placeholder="Enter email" required>
+                </div>
+                
+                <div class="mb-3">
+                    <label for="phone" class="form-label">Mobile phone number (optional)</label>
+                    <input type="tel" class="form-control" id="phone" 
+                           placeholder="+1 234-567-8900">
+                </div>
+                
+                <div class="mb-3">
+                    <label for="password" class="form-label">Password</label>
+                    <input type="password" class="form-control" id="password" 
+                           placeholder="At least 6 characters" required minlength="6"
+                           oninput="checkPasswordStrength()">
+                    <div class="password-strength" id="passwordStrength"></div>
+                    <small class="text-muted">Passwords must be at least 6 characters.</small>
+                </div>
+                
+                <div class="mb-3">
+                    <label for="confirmPassword" class="form-label">Re-enter password</label>
+                    <input type="password" class="form-control" id="confirmPassword" 
+                           placeholder="Confirm password" required>
+                </div>
+                
+                <button type="submit" class="btn btn-create mb-3" id="createBtn">
+                    Create your ShopMart account
+                </button>
+                
+                <p style="font-size:0.75rem;color:#555;line-height:1.5;">
+                    By creating an account, you agree to ShopMart's 
+                    <a href="#" style="color:#0066c0;">Conditions of Use</a> and 
+                    <a href="#" style="color:#0066c0;">Privacy Notice</a>.
+                </p>
+            </form>
+            
+            <hr>
+            
+            <div class="text-center">
+                <p class="mb-1">Already have an account?</p>
+                <a href="login.html" class="signin-link">
+                    <i class="bi bi-box-arrow-in-right me-1"></i> Sign in
                 </a>
             </div>
-        `;
+        </div>
+    </div>
 
-        // Position relative to parent
-        linkElement.parentElement.style.position = 'relative';
-        linkElement.parentElement.appendChild(dropdown);
-
-        // Toggle dropdown on click
-        linkElement.addEventListener('click', (e) => {
-            e.preventDefault();
-            dropdown.style.display = dropdown.style.display === 'block' ? 'none' : 'block';
-        });
-
-        // Close dropdown when clicking outside
-        document.addEventListener('click', (e) => {
-            if (!linkElement.contains(e.target) && !dropdown.contains(e.target)) {
-                dropdown.style.display = 'none';
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="../assets/js/auth.js"></script>
+    
+    <script>
+        // Password strength checker
+        function checkPasswordStrength() {
+            const password = document.getElementById('password').value;
+            const strengthBar = document.getElementById('passwordStrength');
+            
+            strengthBar.className = 'password-strength';
+            
+            if (password.length >= 8 && /[A-Z]/.test(password) && /[0-9]/.test(password)) {
+                strengthBar.classList.add('strength-strong');
+            } else if (password.length >= 6) {
+                strengthBar.classList.add('strength-medium');
+            } else if (password.length > 0) {
+                strengthBar.classList.add('strength-weak');
             }
-        });
-    }
-
-    // Require login to access page
-    requireAuth(redirectUrl = 'pages/login.html') {
-        if (!this.isLoggedIn()) {
-            window.location.href = redirectUrl;
-            return false;
-        }
-        return true;
-    }
-
-    // Utility functions
-    isValidEmail(email) {
-        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-        return emailRegex.test(email);
-    }
-
-    getProviderIcon(provider) {
-        const icons = {
-            'Google': 'https://img.icons8.com/color/48/google-logo.png',
-            'Facebook': 'https://img.icons8.com/color/48/facebook.png',
-            'GitHub': 'https://img.icons8.com/ios-glyphs/48/github.png',
-            'Microsoft': 'https://img.icons8.com/color/48/microsoft.png',
-            'Twitter': 'https://img.icons8.com/color/48/twitter.png'
-        };
-        return icons[provider] || null;
-    }
-
-    // Simulate password reset
-    async forgotPassword(email) {
-        const user = this.users.find(u => u.email.toLowerCase() === email.toLowerCase());
-        if (!user) {
-            return {
-                success: false,
-                message: 'No account found with this email address'
-            };
         }
         
-        return {
-            success: true,
-            message: `Password reset link sent to ${email}. (Demo: password is "${user.password}")`
-        };
-    }
-}
-
-// Create global auth instance
-const authSystem = new AuthSystem();
-
-// Export for use in other modules
-window.authSystem = authSystem;
+        // Handle signup
+        document.getElementById('signupForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const name = document.getElementById('name').value.trim();
+            const email = document.getElementById('email').value.trim();
+            const phone = document.getElementById('phone').value.trim();
+            const password = document.getElementById('password').value;
+            const confirmPassword = document.getElementById('confirmPassword').value;
+            const createBtn = document.getElementById('createBtn');
+            const errorAlert = document.getElementById('errorAlert');
+            const successAlert = document.getElementById('successAlert');
+            
+            // Hide alerts
+            errorAlert.style.display = 'none';
+            successAlert.style.display = 'none';
+            
+            // Validation
+            if (!name || !email || !password || !confirmPassword) {
+                showAlert(errorAlert, 'Please fill in all required fields');
+                return;
+            }
+            
+            if (password !== confirmPassword) {
+                showAlert(errorAlert, 'Passwords do not match');
+                return;
+            }
+            
+            if (password.length < 6) {
+                showAlert(errorAlert, 'Password must be at least 6 characters');
+                return;
+            }
+            
+            // Show loading
+            createBtn.disabled = true;
+            createBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Creating account...';
+            
+            // Attempt signup
+            const result = await authSystem.signup({
+                displayName: name,
+                email: email,
+                password: password,
+                phone: phone
+            });
+            
+            if (result.success) {
+                showAlert(successAlert, result.message);
+                
+                setTimeout(() => {
+                    window.location.href = '../index.html';
+                }, 1500);
+            } else {
+                showAlert(errorAlert, result.message);
+                createBtn.disabled = false;
+                createBtn.innerHTML = 'Create your ShopMart account';
+            }
+        });
+        
+        function showAlert(element, message) {
+            element.textContent = message;
+            element.style.display = 'block';
+            setTimeout(() => { element.style.display = 'none'; }, 5000);
+        }
+    </script>
+</body>
+</html>
