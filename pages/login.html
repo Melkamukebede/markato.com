@@ -35,13 +35,13 @@
         
         .login-container {
             width: 100%;
-            max-width: 400px;
+            max-width: 420px;
         }
         
         .login-card {
             background: #ffffff;
             border-radius: 12px;
-            padding: 30px 25px;
+            padding: 30px;
             box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
             border: 1px solid #e0e0e0;
         }
@@ -55,6 +55,12 @@
             display: block;
             margin-bottom: 25px;
             letter-spacing: -0.5px;
+            transition: all 0.2s;
+        }
+        
+        .logo-brand:hover {
+            color: var(--amazon-orange);
+            transform: scale(1.05);
         }
         
         .logo-brand .dot {
@@ -76,7 +82,7 @@
         
         .form-control {
             border: 1.5px solid #a6a6a6;
-            border-radius: 4px;
+            border-radius: 6px;
             padding: 10px 12px;
             font-size: 0.9rem;
             transition: all 0.2s ease;
@@ -94,7 +100,7 @@
             font-weight: 600;
             padding: 12px;
             border-radius: 8px;
-            font-size: 0.9rem;
+            font-size: 0.95rem;
             transition: all 0.2s ease;
             color: #1a1a1a;
             width: 100%;
@@ -110,7 +116,39 @@
             transform: scale(0.98);
         }
         
-        /* Social Login Buttons */
+        .btn-signin:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+        
+        /* Alert Messages */
+        .alert {
+            padding: 12px 16px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            font-size: 0.85rem;
+            display: none;
+        }
+        
+        .alert-danger {
+            background: #fce4e4;
+            color: #cc0c39;
+            border: 1px solid #f5c6cb;
+        }
+        
+        .alert-success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        
+        .alert-info {
+            background: #d1ecf1;
+            color: #0c5460;
+            border: 1px solid #bee5eb;
+        }
+        
+        /* Divider */
         .divider {
             display: flex;
             align-items: center;
@@ -129,8 +167,10 @@
         
         .divider span {
             padding: 0 15px;
+            background: #fff;
         }
         
+        /* Social Buttons */
         .btn-social {
             display: flex;
             align-items: center;
@@ -147,7 +187,6 @@
             transition: all 0.2s ease;
             margin-bottom: 10px;
             color: #333;
-            text-decoration: none;
         }
         
         .btn-social:hover {
@@ -157,82 +196,20 @@
             transform: translateY(-1px);
         }
         
-        .btn-google {
-            border-color: #4285f4;
-            color: #4285f4;
-        }
-        .btn-google:hover {
-            background: #f8fbff;
-            border-color: #3367d6;
-        }
+        .btn-google { border-color: #4285f4; color: #4285f4; }
+        .btn-facebook { border-color: #1877f2; color: #1877f2; }
+        .btn-github { border-color: #333333; color: #333333; }
+        .btn-microsoft { border-color: #00a4ef; color: #00a4ef; }
         
-        .btn-facebook {
-            border-color: #1877f2;
-            color: #1877f2;
-        }
-        .btn-facebook:hover {
-            background: #f0f6ff;
-            border-color: #166fe5;
-        }
+        .btn-social i { font-size: 1.2rem; }
         
-        .btn-github {
-            border-color: #333333;
-            color: #333333;
-        }
-        .btn-github:hover {
-            background: #f5f5f5;
-            border-color: #000000;
-        }
-        
-        .btn-microsoft {
-            border-color: #00a4ef;
-            color: #00a4ef;
-        }
-        .btn-microsoft:hover {
-            background: #f0f9ff;
-            border-color: #0078d4;
-        }
-        
-        .btn-twitter {
-            border-color: #1da1f2;
-            color: #1da1f2;
-        }
-        .btn-twitter:hover {
-            background: #f0f8ff;
-            border-color: #1a91da;
-        }
-        
-        .btn-social i {
-            font-size: 1.2rem;
-        }
-        
-        .alert {
-            padding: 10px 15px;
-            border-radius: 6px;
-            margin-bottom: 15px;
-            font-size: 0.85rem;
-            display: none;
-        }
-        
-        .alert-danger {
-            background: #fce4e4;
-            color: #cc0c39;
-            border: 1px solid #f5c6cb;
-        }
-        
-        .alert-success {
-            background: #d4edda;
-            color: #155724;
-            border: 1px solid #c3e6cb;
-        }
-        
-        .forgot-password {
+        .forgot-link {
             color: #0066c0;
             text-decoration: none;
             font-size: 0.85rem;
         }
         
-        .forgot-password:hover {
+        .forgot-link:hover {
             color: #c45500;
             text-decoration: underline;
         }
@@ -248,14 +225,16 @@
             text-decoration: underline;
         }
         
-        /* Responsive */
+        /* Loading Spinner */
+        .spinner-border-sm {
+            width: 1rem;
+            height: 1rem;
+            border-width: 0.15em;
+        }
+        
         @media (max-width: 480px) {
             .login-card {
                 padding: 20px 16px;
-            }
-            
-            .logo-brand {
-                font-size: 1.6rem;
             }
         }
     </style>
@@ -274,33 +253,38 @@
             <!-- Alert Messages -->
             <div class="alert alert-danger" id="errorAlert"></div>
             <div class="alert alert-success" id="successAlert"></div>
+            <div class="alert alert-info" id="infoAlert">
+                <i class="bi bi-info-circle me-2"></i>
+                Demo credentials: <strong>demo@shopmart.com</strong> / <strong>demo123</strong>
+            </div>
             
-            <!-- Email/Password Form -->
-            <form id="loginForm" onsubmit="return handleLogin(event);">
+            <!-- Login Form -->
+            <form id="loginForm" onsubmit="return false;">
                 <div class="mb-3">
                     <label for="email" class="form-label">Email or mobile phone number</label>
-                    <input type="email" class="form-control" id="email" placeholder="demo@shopmart.com" required>
-                    <small class="text-muted">Demo: use any email (e.g., demo@shopmart.com)</small>
+                    <input type="email" class="form-control" id="email" 
+                           placeholder="demo@shopmart.com" required autocomplete="email">
                 </div>
                 
                 <div class="mb-3">
-                    <label for="password" class="form-label">Password</label>
-                    <input type="password" class="form-control" id="password" placeholder="Enter password" required>
-                    <small class="text-muted">Demo: use any password (min 6 characters)</small>
+                    <div class="d-flex justify-content-between">
+                        <label for="password" class="form-label">Password</label>
+                        <a href="forgot-password.html" class="forgot-link">Forgot password?</a>
+                    </div>
+                    <input type="password" class="form-control" id="password" 
+                           placeholder="Enter password" required autocomplete="current-password">
                 </div>
                 
-                <button type="submit" class="btn btn-signin mb-3">
+                <div class="mb-3 form-check">
+                    <input type="checkbox" class="form-check-input" id="rememberMe">
+                    <label class="form-check-label" for="rememberMe" style="font-size:0.85rem;">
+                        Keep me signed in
+                    </label>
+                </div>
+                
+                <button type="submit" class="btn btn-signin mb-3" id="signInBtn">
                     Sign in
                 </button>
-                
-                <div class="d-flex justify-content-between mb-3">
-                    <a href="#" class="forgot-password">
-                        <i class="bi bi-question-circle me-1"></i> Forgot password?
-                    </a>
-                    <a href="#" class="forgot-password">
-                        <i class="bi bi-info-circle me-1"></i> Need help?
-                    </a>
-                </div>
                 
                 <p style="font-size:0.75rem;color:#555;line-height:1.5;">
                     By continuing, you agree to ShopMart's 
@@ -314,36 +298,26 @@
                 <span>or sign in with</span>
             </div>
             
-            <!-- Social Login Buttons (Demo - Simulated) -->
+            <!-- Social Login -->
             <div class="social-login-section">
-                <!-- Google -->
                 <button class="btn-social btn-google" onclick="handleSocialLogin('Google')">
                     <i class="bi bi-google"></i>
                     Continue with Google
                 </button>
                 
-                <!-- Facebook -->
                 <button class="btn-social btn-facebook" onclick="handleSocialLogin('Facebook')">
                     <i class="bi bi-facebook"></i>
                     Continue with Facebook
                 </button>
                 
-                <!-- GitHub -->
                 <button class="btn-social btn-github" onclick="handleSocialLogin('GitHub')">
                     <i class="bi bi-github"></i>
                     Continue with GitHub
                 </button>
                 
-                <!-- Microsoft -->
                 <button class="btn-social btn-microsoft" onclick="handleSocialLogin('Microsoft')">
                     <i class="bi bi-microsoft"></i>
                     Continue with Microsoft
-                </button>
-                
-                <!-- Twitter -->
-                <button class="btn-social btn-twitter" onclick="handleSocialLogin('Twitter')">
-                    <i class="bi bi-twitter-x"></i>
-                    Continue with Twitter
                 </button>
             </div>
             
@@ -352,183 +326,125 @@
                 <span>New to ShopMart?</span>
             </div>
             <div class="text-center">
-                <a href="#" class="create-account-link" onclick="handleCreateAccount()">
+                <a href="signup.html" class="create-account-link">
+                    <i class="bi bi-person-plus me-1"></i>
                     Create your ShopMart account
                 </a>
             </div>
         </div>
         
-        <!-- Footer Links -->
+        <!-- Footer -->
         <div class="text-center mt-3" style="font-size:0.8rem;">
             <a href="#" style="color:#0066c0;text-decoration:none;margin:0 10px;">Conditions of Use</a>
             <a href="#" style="color:#0066c0;text-decoration:none;margin:0 10px;">Privacy Notice</a>
             <a href="#" style="color:#0066c0;text-decoration:none;margin:0 10px;">Help</a>
         </div>
         <p class="text-center text-muted mt-2" style="font-size:0.75rem;">
-            © 2024 ShopMart. All rights reserved. Demo site.
+            © 2024 ShopMart. All rights reserved.
         </p>
     </div>
 
     <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
     
+    <!-- Auth System -->
+    <script src="../assets/js/auth.js"></script>
+    
     <!-- Login Logic -->
     <script>
-        // ============================================
-        // Demo Authentication (Works without Firebase)
-        // ============================================
-        
-        // Handle Email/Password Login
-        function handleLogin(event) {
-            event.preventDefault();
+        // Wait for auth system to initialize
+        window.addEventListener('DOMContentLoaded', () => {
+            // Check if already logged in
+            setTimeout(() => {
+                if (authSystem.isLoggedIn()) {
+                    window.location.href = '../index.html';
+                }
+            }, 500);
+        });
+
+        // Handle form submission
+        document.getElementById('loginForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
             
             const email = document.getElementById('email').value.trim();
-            const password = document.getElementById('password').value.trim();
+            const password = document.getElementById('password').value;
+            const signInBtn = document.getElementById('signInBtn');
             const errorAlert = document.getElementById('errorAlert');
             const successAlert = document.getElementById('successAlert');
+            const infoAlert = document.getElementById('infoAlert');
             
             // Hide alerts
             errorAlert.style.display = 'none';
             successAlert.style.display = 'none';
             
             // Validation
-            if (!email) {
-                showError('Please enter your email address');
-                return false;
+            if (!email || !password) {
+                showAlert(errorAlert, 'Please fill in all fields');
+                return;
             }
             
-            if (!password) {
-                showError('Please enter your password');
-                return false;
-            }
-            
-            if (password.length < 6) {
-                showError('Password must be at least 6 characters');
-                return false;
-            }
-            
-            // Simulate login (in real app, this would call Firebase/API)
-            simulateLogin(email, password, 'email');
-            return false;
-        }
-        
-        // Handle Social Login (Demo)
-        function handleSocialLogin(provider) {
-            const demoEmails = {
-                'Google': 'demo@gmail.com',
-                'Facebook': 'demo@facebook.com',
-                'GitHub': 'demo@github.com',
-                'Microsoft': 'demo@outlook.com',
-                'Twitter': 'demo@twitter.com'
-            };
-            
-            const email = demoEmails[provider] || `demo@${provider.toLowerCase()}.com`;
-            const name = `Demo ${provider} User`;
-            
-            simulateLogin(email, 'social123', provider.toLowerCase(), name);
-        }
-        
-        // Handle Create Account
-        function handleCreateAccount() {
-            const email = prompt('Enter your email to create an account:');
-            if (email) {
-                simulateLogin(email, 'newuser123', 'email', email.split('@')[0]);
-            }
-        }
-        
-        // Core Login Function
-        function simulateLogin(email, password, provider, displayName = null) {
             // Show loading state
-            const signInBtn = document.getElementById('signInBtn');
-            if (signInBtn) {
-                signInBtn.disabled = true;
-                signInBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Signing in...';
-            }
+            signInBtn.disabled = true;
+            signInBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Signing in...';
             
-            // Simulate network delay
-            setTimeout(() => {
-                // Create user object
-                const userData = {
-                    uid: 'user_' + Date.now(),
-                    displayName: displayName || email.split('@')[0],
-                    email: email,
-                    photoURL: getProviderIcon(provider),
-                    provider: provider,
-                    lastLogin: new Date().toISOString(),
-                    isLoggedIn: true
-                };
-                
-                // Save to localStorage
-                localStorage.setItem('shopmart_user', JSON.stringify(userData));
+            // Attempt login
+            const result = await authSystem.login(email, password);
+            
+            if (result.success) {
+                // Hide info alert
+                infoAlert.style.display = 'none';
                 
                 // Show success
-                showSuccess(`Welcome, ${userData.displayName}! 🎉`);
+                showAlert(successAlert, result.message);
                 
-                // Redirect to home page after short delay
+                // Redirect to home page
                 setTimeout(() => {
                     window.location.href = '../index.html';
                 }, 1000);
+            } else {
+                // Show error
+                showAlert(errorAlert, result.message);
                 
-            }, 800);
-        }
-        
-        // Get provider icon URL
-        function getProviderIcon(provider) {
-            const icons = {
-                'google': 'https://img.icons8.com/color/48/google-logo.png',
-                'facebook': 'https://img.icons8.com/color/48/facebook.png',
-                'github': 'https://img.icons8.com/ios-glyphs/48/github.png',
-                'microsoft': 'https://img.icons8.com/color/48/microsoft.png',
-                'twitter': 'https://img.icons8.com/color/48/twitter.png',
-                'email': null
-            };
-            return icons[provider] || null;
-        }
-        
-        // UI Helper Functions
-        function showError(message) {
-            const errorAlert = document.getElementById('errorAlert');
-            errorAlert.textContent = message;
-            errorAlert.style.display = 'block';
-            
-            // Hide after 5 seconds
-            setTimeout(() => {
-                errorAlert.style.display = 'none';
-            }, 5000);
-        }
-        
-        function showSuccess(message) {
-            const successAlert = document.getElementById('successAlert');
-            successAlert.textContent = message;
-            successAlert.style.display = 'block';
-            
-            // Hide after 5 seconds
-            setTimeout(() => {
-                successAlert.style.display = 'none';
-            }, 5000);
-        }
-        
-        // Check if already logged in
-        window.addEventListener('DOMContentLoaded', () => {
-            const user = localStorage.getItem('shopmart_user');
-            if (user) {
-                const userData = JSON.parse(user);
-                console.log('👤 Already logged in as:', userData.displayName);
+                // Reset button
+                signInBtn.disabled = false;
+                signInBtn.innerHTML = 'Sign in';
                 
-                // Optionally redirect if already logged in
-                // window.location.href = '../index.html';
+                // Clear password field
+                document.getElementById('password').value = '';
             }
         });
+
+        // Social Login Handler
+        async function handleSocialLogin(provider) {
+            const result = await authSystem.socialLogin(provider);
+            
+            if (result.success) {
+                document.getElementById('infoAlert').style.display = 'none';
+                showAlert(document.getElementById('successAlert'), result.message);
+                
+                setTimeout(() => {
+                    window.location.href = '../index.html';
+                }, 1000);
+            }
+        }
+
+        // Helper: Show alert
+        function showAlert(element, message) {
+            element.textContent = message;
+            element.style.display = 'block';
+            
+            // Auto hide after 5 seconds
+            setTimeout(() => {
+                element.style.display = 'none';
+            }, 5000);
+        }
         
-        // Allow Enter key to submit
+        // Keyboard shortcut: Enter to submit
         document.addEventListener('keypress', (e) => {
-            if (e.key === 'Enter' && document.activeElement.tagName === 'INPUT') {
-                handleLogin(e);
+            if (e.key === 'Enter') {
+                document.getElementById('loginForm').dispatchEvent(new Event('submit'));
             }
         });
-        
-        console.log('✅ Login page ready (Demo mode - no Firebase required)');
-        console.log('💡 Use any email and password (min 6 chars) to login');
     </script>
 </body>
 </html>
