@@ -4,296 +4,99 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ShopMart - Create Account</title>
-    
-    <!-- Bootstrap 5 CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-    <!-- Bootstrap Icons -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
-    
     <style>
-        :root {
-            --amazon-dark: #131921;
-            --amazon-orange: #febd69;
-            --amazon-yellow: #f3a847;
-        }
-        
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-        }
-        
-        body {
-            background: linear-gradient(135deg, #eaeded 0%, #d5dbdb 100%);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            min-height: 100vh;
-            padding: 20px;
-            font-family: 'Segoe UI', 'Amazon Ember', Arial, sans-serif;
-        }
-        
-        .signup-container {
-            width: 100%;
-            max-width: 420px;
-        }
-        
-        .signup-card {
-            background: #ffffff;
-            border-radius: 12px;
-            padding: 30px;
-            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
-            border: 1px solid #e0e0e0;
-        }
-        
-        .logo-brand {
-            font-size: 2rem;
-            font-weight: 800;
-            color: var(--amazon-dark);
-            text-decoration: none;
-            text-align: center;
-            display: block;
-            margin-bottom: 20px;
-            letter-spacing: -0.5px;
-        }
-        
+        :root { --amazon-dark:#131921; --amazon-mid:#232f3e; --amazon-orange:#febd69; --amazon-link:#007185; }
+        body { background: #f3f3f3; font-family: Arial, sans-serif; }
+        .header-top { background: var(--amazon-dark); padding: 10px 0; text-align: center; }
+        .logo-brand { color: #fff; font-size: 1.6rem; font-weight: 800; text-decoration: none; letter-spacing: -1px; }
         .logo-brand .dot { color: var(--amazon-orange); }
-        
-        .signup-card h4 {
-            font-weight: 600;
-            margin-bottom: 20px;
-            color: #0f1111;
+        .auth-card {
+            background: #fff; border: 1px solid #ddd; border-radius: 8px;
+            padding: 28px 28px 22px; width: 100%; max-width: 380px; margin: 28px auto;
         }
-        
-        .form-label {
-            font-weight: 600;
-            font-size: 0.85rem;
-            color: #0f1111;
-            margin-bottom: 4px;
-        }
-        
-        .form-control {
-            border: 1.5px solid #a6a6a6;
-            border-radius: 6px;
-            padding: 10px 12px;
-            font-size: 0.9rem;
-            transition: all 0.2s ease;
-        }
-        
-        .form-control:focus {
-            border-color: var(--amazon-orange);
-            box-shadow: 0 0 0 3px rgba(254, 189, 105, 0.3);
-        }
-        
+        .auth-card h4 { font-size: 1.2rem; font-weight: 700; margin-bottom: 18px; }
+        .form-label { font-size: 0.85rem; font-weight: 600; }
+        .form-control { font-size: 0.9rem; border-radius: 6px; }
+        .form-control:focus { box-shadow: 0 0 0 3px rgba(255,153,0,.3); border-color: #e77600; }
+        .form-hint { font-size: 0.75rem; color: #777; margin-top: 3px; }
         .btn-create {
-            background: var(--amazon-orange);
-            border: none;
-            font-weight: 600;
-            padding: 12px;
-            border-radius: 8px;
-            font-size: 0.95rem;
-            transition: all 0.2s ease;
-            color: #1a1a1a;
-            width: 100%;
-            cursor: pointer;
+            background: linear-gradient(to bottom, #f7dfa5, #f0c14b);
+            border: 1px solid #a88734;
+            color: #111; font-weight: 600; border-radius: 6px; padding: 8px;
+            width: 100%; cursor: pointer; font-size: 0.95rem;
         }
-        
-        .btn-create:hover {
-            background: var(--amazon-yellow);
-            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.15);
-        }
-        
-        .btn-create:disabled {
-            opacity: 0.6;
-            cursor: not-allowed;
-        }
-        
-        .alert {
-            padding: 12px 16px;
-            border-radius: 8px;
-            margin-bottom: 15px;
-            font-size: 0.85rem;
-            display: none;
-        }
-        
-        .alert-danger { background: #fce4e4; color: #cc0c39; border: 1px solid #f5c6cb; }
-        .alert-success { background: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
-        
-        .signin-link {
-            color: #0066c0;
-            text-decoration: none;
-            font-weight: 500;
-        }
-        
-        .signin-link:hover { color: #c45500; text-decoration: underline; }
-        
-        .password-strength {
-            height: 4px;
-            border-radius: 2px;
-            margin-top: 5px;
-            transition: all 0.3s;
-        }
-        
-        .strength-weak { background: #ff4444; width: 33%; }
-        .strength-medium { background: #ffbb33; width: 66%; }
-        .strength-strong { background: #00C851; width: 100%; }
-        
-        @media (max-width: 480px) {
-            .signup-card { padding: 20px 16px; }
-        }
+        .btn-create:hover { background: linear-gradient(to bottom, #f5d78e, #eeb933); }
+        .terms-text { font-size: 0.75rem; color: #555; margin: 14px 0; line-height: 1.5; }
+        .terms-text a { color: var(--amazon-link); text-decoration: none; }
+        .terms-text a:hover { text-decoration: underline; }
+        .auth-footer { border-top: 1px solid #eee; margin-top: 18px; padding-top: 14px; text-align: center; font-size: 0.82rem; color: #555; }
+        .auth-footer a { color: var(--amazon-link); text-decoration: none; font-weight: 600; }
+        .auth-footer a:hover { text-decoration: underline; }
+        .page-footer { text-align: center; font-size: 0.75rem; color: #888; padding: 20px; }
+        .page-footer a { color: #555; text-decoration: none; margin: 0 8px; }
+        .page-footer a:hover { text-decoration: underline; }
     </style>
 </head>
 <body>
-    <div class="signup-container">
-        <a href="../index.html" class="logo-brand">
-            shop<span class="dot">.</span>mart
-        </a>
-        
-        <div class="signup-card">
-            <h4>Create account</h4>
-            
-            <div class="alert alert-danger" id="errorAlert"></div>
-            <div class="alert alert-success" id="successAlert"></div>
-            
-            <form id="signupForm">
-                <div class="mb-3">
-                    <label for="name" class="form-label">Your name</label>
-                    <input type="text" class="form-control" id="name" 
-                           placeholder="First and last name" required>
-                </div>
-                
-                <div class="mb-3">
-                    <label for="email" class="form-label">Email</label>
-                    <input type="email" class="form-control" id="email" 
-                           placeholder="Enter email" required>
-                </div>
-                
-                <div class="mb-3">
-                    <label for="phone" class="form-label">Mobile phone number (optional)</label>
-                    <input type="tel" class="form-control" id="phone" 
-                           placeholder="+1 234-567-8900">
-                </div>
-                
-                <div class="mb-3">
-                    <label for="password" class="form-label">Password</label>
-                    <input type="password" class="form-control" id="password" 
-                           placeholder="At least 6 characters" required minlength="6"
-                           oninput="checkPasswordStrength()">
-                    <div class="password-strength" id="passwordStrength"></div>
-                    <small class="text-muted">Passwords must be at least 6 characters.</small>
-                </div>
-                
-                <div class="mb-3">
-                    <label for="confirmPassword" class="form-label">Re-enter password</label>
-                    <input type="password" class="form-control" id="confirmPassword" 
-                           placeholder="Confirm password" required>
-                </div>
-                
-                <button type="submit" class="btn btn-create mb-3" id="createBtn">
-                    Create your ShopMart account
-                </button>
-                
-                <p style="font-size:0.75rem;color:#555;line-height:1.5;">
-                    By creating an account, you agree to ShopMart's 
-                    <a href="#" style="color:#0066c0;">Conditions of Use</a> and 
-                    <a href="#" style="color:#0066c0;">Privacy Notice</a>.
-                </p>
-            </form>
-            
-            <hr>
-            
-            <div class="text-center">
-                <p class="mb-1">Already have an account?</p>
-                <a href="login.html" class="signin-link">
-                    <i class="bi bi-box-arrow-in-right me-1"></i> Sign in
-                </a>
-            </div>
-        </div>
-    </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="../assets/js/auth.js"></script>
-    
-    <script>
-        // Password strength checker
-        function checkPasswordStrength() {
-            const password = document.getElementById('password').value;
-            const strengthBar = document.getElementById('passwordStrength');
-            
-            strengthBar.className = 'password-strength';
-            
-            if (password.length >= 8 && /[A-Z]/.test(password) && /[0-9]/.test(password)) {
-                strengthBar.classList.add('strength-strong');
-            } else if (password.length >= 6) {
-                strengthBar.classList.add('strength-medium');
-            } else if (password.length > 0) {
-                strengthBar.classList.add('strength-weak');
-            }
-        }
-        
-        // Handle signup
-        document.getElementById('signupForm').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            
-            const name = document.getElementById('name').value.trim();
-            const email = document.getElementById('email').value.trim();
-            const phone = document.getElementById('phone').value.trim();
-            const password = document.getElementById('password').value;
-            const confirmPassword = document.getElementById('confirmPassword').value;
-            const createBtn = document.getElementById('createBtn');
-            const errorAlert = document.getElementById('errorAlert');
-            const successAlert = document.getElementById('successAlert');
-            
-            // Hide alerts
-            errorAlert.style.display = 'none';
-            successAlert.style.display = 'none';
-            
-            // Validation
-            if (!name || !email || !password || !confirmPassword) {
-                showAlert(errorAlert, 'Please fill in all required fields');
-                return;
-            }
-            
-            if (password !== confirmPassword) {
-                showAlert(errorAlert, 'Passwords do not match');
-                return;
-            }
-            
-            if (password.length < 6) {
-                showAlert(errorAlert, 'Password must be at least 6 characters');
-                return;
-            }
-            
-            // Show loading
-            createBtn.disabled = true;
-            createBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Creating account...';
-            
-            // Attempt signup
-            const result = await authSystem.signup({
-                displayName: name,
-                email: email,
-                password: password,
-                phone: phone
-            });
-            
-            if (result.success) {
-                showAlert(successAlert, result.message);
-                
-                setTimeout(() => {
-                    window.location.href = '../index.html';
-                }, 1500);
-            } else {
-                showAlert(errorAlert, result.message);
-                createBtn.disabled = false;
-                createBtn.innerHTML = 'Create your ShopMart account';
-            }
-        });
-        
-        function showAlert(element, message) {
-            element.textContent = message;
-            element.style.display = 'block';
-            setTimeout(() => { element.style.display = 'none'; }, 5000);
-        }
-    </script>
+<header class="header-top">
+    <a href="../index.html" class="logo-brand">merkato<span class="dot">.</span>com</a>
+</header>
+
+<div class="auth-card">
+    <h4>Create account</h4>
+
+    <!-- Error placeholder -->
+    <div id="signupError"></div>
+
+    <form id="signupForm" novalidate>
+        <div class="mb-3">
+            <label class="form-label" for="signupName">Your name</label>
+            <input type="text" class="form-control" id="signupName" placeholder="First and last name" autocomplete="name" required>
+        </div>
+        <div class="mb-3">
+            <label class="form-label" for="signupEmail">Email</label>
+            <input type="email" class="form-control" id="signupEmail" autocomplete="email" required>
+        </div>
+        <div class="mb-3">
+            <label class="form-label" for="signupPhone">Mobile phone number <span class="text-muted fw-normal">(optional)</span></label>
+            <input type="tel" class="form-control" id="signupPhone" placeholder="+251 91 234 5678" autocomplete="tel">
+            <div class="form-hint">May be used for account security</div>
+        </div>
+        <div class="mb-3">
+            <label class="form-label" for="signupPassword">Password</label>
+            <input type="password" class="form-control" id="signupPassword" autocomplete="new-password" required>
+            <div class="form-hint">Passwords must be at least 6 characters.</div>
+        </div>
+        <div class="mb-3">
+            <label class="form-label" for="signupPassword2">Re-enter password</label>
+            <input type="password" class="form-control" id="signupPassword2" autocomplete="new-password" required>
+        </div>
+
+        <div class="terms-text">
+            By creating an account, you agree to Merkato's
+            <a href="#">Conditions of Use</a> and <a href="#">Privacy Notice</a>.
+        </div>
+
+        <button type="submit" class="btn-create">Create your Merkato account</button>
+    </form>
+
+    <div class="auth-footer">
+        Already have an account?<br>
+        <a href="login.html">Sign in</a>
+    </div>
+</div>
+
+<div class="page-footer">
+    <a href="#">Conditions of Use</a>
+    <a href="#">Privacy Notice</a>
+    <a href="#">Help</a>
+    <p class="mt-2 mb-0">© 2024 ShopMart. All rights reserved.</p>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<script src="../assets/js/auth.js"></script>
 </body>
 </html>
