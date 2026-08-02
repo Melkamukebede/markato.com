@@ -254,47 +254,142 @@
             loadUserData();
         });
         
-        function loadUserData() {
-            const user = authSystem.getCurrentUser();
-            if (!user) return;
+        // In the <script> section of account.html, update loadUserData():
+
+function loadUserData() {
+    const user = authSystem.getCurrentUser();
+    if (!user) return;
+    
+    // Update header
+    document.getElementById('userName').textContent = user.displayName;
+    
+    // 🆕 Get fresh data from auth system
+    const orders = authSystem.getOrders();
+    const wishlist = authSystem.getWishlist();
+    
+    // Update stats
+    document.getElementById('orderCount').textContent = orders.length;
+    document.getElementById('wishlistCount').textContent = wishlist.length;
+    
+    if (user.joinedDate) {
+        document.getElementById('memberSince').textContent = user.joinedDate.substring(0, 4);
+    }
+    
+    // Update profile form
+    document.getElementById('profileName').value = user.displayName || '';
+    document.getElementById('profileEmail').value = user.email || '';
+    document.getElementById('profilePhone').value = user.phone || '';
+    document.getElementById('profileAddress').value = user.address || '';
+    
+    // 🆕 Render orders
+    renderOrders(orders);
+    
+    // 🆕 Render wishlist
+    renderWishlist(wishlist);
+}
+
+// 🆕 Render orders list
+function renderOrders(orders) {
+    const ordersList = document.getElementById('ordersList');
+    
+    if (!orders || orders.length === 0) {
+        ordersList.innerHTML = `
+            <div class="order-card">
+                <p class="text-muted text-center py-4">
+                    <i class="bi bi-inbox" style="font-size:3rem;"></i><br>
+                    No orders yet
+                </p>
+                <div class="text-center">
+                    <a href="../index.html" class="btn btn-warning fw-bold px-4">
+                        Start Shopping
+                    </a>
+                </div>
+            </div>`;
+        return;
+    }
+    
+    ordersList.innerHTML = orders.map(order => `
+        <div class="order-card">
+            <div class="d-flex justify-content-between align-items-start">
+                <div>
+                    <h6>Order #${order.id}</h6>
+                    <small class="text-muted">${new Date(order.date).toLocaleDateString()}</small>
+                    <p class="mt-2 mb-1"><strong>Total: $${order.total.toFixed(2)}</strong></p>
+                    <span class="badge bg-success">${order.status || 'Processing'}</span>
+                </div>
+                <div>
+                    <small class="text-muted">${order.items ? order.items.length : 0} items</small>
+                </div>
+            </div>
+        </div>
+    `).join('');
+}
+
+// 🆕 Render wishlist items
+function renderWishlist(wishlistItems) {
+    const wishlistContainer = document.getElementById('wishlistItems');
+    
+    if (!wishlistItems || wishlistItems.length === 0) {
+        wishlistContainer.innerHTML = `
+            <p class="text-muted text-center py-4">
+                <i class="bi bi-heart" style="font-size:3rem;"></i><br>
+                Your wishlist is empty
+            </p>
+            <div class="text-center">
+                <a href="../index.html" class="btn btn-warning fw-bold px-4">
+                    Browse Products
+                </a>
+            </div>`;
+        return;
+    }
+    
+    // Load products data to display wishlist items
+    fetch('../data/products.json')
+        .then(response => response.json())
+        .then(products => {
+            const wishlistProducts = products.filter(p => wishlistItems.includes(p.id));
             
-            // Update header
-            document.getElementById('userName').textContent = user.displayName;
-            
-            // Update stats
-            document.getElementById('orderCount').textContent = user.orders ? user.orders.length : 0;
-            document.getElementById('wishlistCount').textContent = user.wishlist ? user.wishlist.length : 0;
-            
-            if (user.joinedDate) {
-                const date = new Date(user.joinedDate);
-                document.getElementById('memberSince').textContent = date.getFullYear();
-            }
-            
-            // Update profile form
-            document.getElementById('profileName').value = user.displayName || '';
-            document.getElementById('profileEmail').value = user.email || '';
-            document.getElementById('profilePhone').value = user.phone || '';
-            document.getElementById('profileAddress').value = user.address || '';
-        }
-        
-        // Handle profile update
-        document.getElementById('profileForm').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            
-            const updates = {
-                displayName: document.getElementById('profileName').value,
-                phone: document.getElementById('profilePhone').value,
-                address: document.getElementById('profileAddress').value
-            };
-            
-            const success = authSystem.updateProfile(updates);
-            
-            if (success) {
-                alert('Profile updated successfully!');
-                loadUserData();
-            }
+            wishlistContainer.innerHTML = wishlistProducts.map(p => `
+                <div class="order-card d-flex gap-3 align-items-center">
+                    <img src="${p.image}" alt="${p.name}" style="width:80px;height:80px;object-fit:contain;background:#f7f7f7;border-radius:8px;padding:5px;">
+                    <div class="flex-grow-1">
+                        <h6>${p.name}</h6>
+                        <p class="text-muted mb-1">$${p.price.toFixed(2)}</p>
+                        <div class="rating">
+                            ${generateStars(p.rating)}
+                            <small class="text-primary">(${p.reviews})</small>
+                        </div>
+                    </div>
+                    <button class="btn btn-sm btn-outline-danger" onclick="removeFromWishlist(${p.id})">
+                        <i class="bi bi-trash"></i>
+                    </button>
+                </div>
+            `).join('');
+        })
+        .catch(() => {
+            wishlistContainer.innerHTML = '<p class="text-muted text-center">Unable to load wishlist items</p>';
         });
-        
+}
+
+// 🆕 Helper: Generate stars (same as in app.js)
+function generateStars(rating) {
+    const full = Math.floor(rating);
+    const half = rating % 1 >= 0.5 ? 1 : 0;
+    const empty = 5 - full - half;
+    let html = '';
+    for (let i = 0; i < full; i++) html += '<i class="bi bi-star-fill"></i>';
+    if (half) html += '<i class="bi bi-star-half"></i>';
+    for (let i = 0; i < empty; i++) html += '<i class="bi bi-star"></i>';
+    return html;
+}
+
+// 🆕 Remove from wishlist (from account page)
+function removeFromWishlist(productId) {
+    if (authSystem.removeFromWishlist(productId)) {
+        alert('Item removed from wishlist');
+        loadUserData(); // Refresh the page
+    }
+}
         function handleLogout() {
             if (confirm('Are you sure you want to logout?')) {
                 authSystem.logout();
