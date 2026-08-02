@@ -4,8 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="ShopMart - Your one-stop online shopping destination for electronics, clothing, home & kitchen, books, and beauty products.">
-    <meta name="keywords" content="online shopping, ecommerce, electronics, clothing, home kitchen, books, beauty">
-    <title>Merkato - Online Shopping for Electronics, Clothing & More</title>
+    <title>ShopMart - Online Shopping for Electronics, Clothing & More</title>
     
     <!-- Bootstrap 5 CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
@@ -14,7 +13,7 @@
     <!-- Custom CSS -->
     <link rel="stylesheet" href="assets/css/main.css">
     
-    <!-- Additional styles for cart offcanvas (Day 2) -->
+    <!-- Additional styles for cart offcanvas and toast -->
     <style>
         .cart-offcanvas {
             width: 400px !important;
@@ -67,8 +66,19 @@
             background: #f0f0f0;
             cursor: pointer;
             font-weight: 700;
+            font-size: 1rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
-        .qty-control button:hover { background: #ddd; }
+        .qty-control button:hover {
+            background: #ddd;
+        }
+        .qty-control span {
+            font-weight: 700;
+            min-width: 20px;
+            text-align: center;
+        }
         .btn-remove {
             background: none;
             border: none;
@@ -79,7 +89,9 @@
             margin-top: 4px;
             font-weight: 600;
         }
-        .btn-remove:hover { text-decoration: underline; }
+        .btn-remove:hover {
+            text-decoration: underline;
+        }
         .cart-subtotal {
             font-size: 1.2rem;
             font-weight: 700;
@@ -98,14 +110,23 @@
             font-size: 1rem;
             cursor: pointer;
             width: 100%;
+            transition: 0.2s;
         }
-        .btn-checkout:hover { background: #f3a847; }
+        .btn-checkout:hover {
+            background: #f3a847;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        }
         .empty-cart-msg {
             text-align: center;
             padding: 50px 20px;
             color: #888;
         }
-        .empty-cart-msg i { font-size: 4rem; opacity: 0.4; }
+        .empty-cart-msg i {
+            font-size: 4rem;
+            display: block;
+            margin-bottom: 16px;
+            opacity: 0.4;
+        }
         .toast-container {
             position: fixed;
             bottom: 30px;
@@ -116,29 +137,32 @@
             background: #fff;
             border-left: 5px solid #067d62;
             border-radius: 8px;
-            box-shadow: 0 8px 30px rgba(0,0,0,0.2);
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.2);
             font-weight: 600;
             font-size: 0.9rem;
             padding: 14px 18px;
             margin-bottom: 8px;
+            animation: slideInRight 0.4s ease;
         }
-        /* Wishlist liked state */
+        @keyframes slideInRight {
+            from {
+                transform: translateX(120%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
         .wishlist-icon.liked {
             color: #e74c3c !important;
             border-color: #e74c3c !important;
             background: #fff5f5 !important;
         }
-        .discount-badge {
-            position: absolute;
-            top: 12px;
-            right: 12px;
-            background: #b12704;
-            color: #fff;
-            font-size: 0.7rem;
+        .detail-price {
+            font-size: 1.8rem;
             font-weight: 700;
-            padding: 4px 8px;
-            border-radius: 4px;
-            z-index: 2;
+            color: #b12704;
         }
     </style>
 </head>
@@ -149,46 +173,32 @@
             <div class="d-flex align-items-center gap-2 flex-wrap">
                 <!-- Logo -->
                 <a href="index.html" class="logo-brand">
-                    merkato<span class="dot">.</span>com
+                    shop<span class="dot">.</span>mart
                 </a>
 
                 <!-- Deliver To (static) -->
                 <div class="deliver-to d-none d-lg-block">
                     <span>Deliver to</span>
-                    <span class="location-line"><i class="bi bi-geo-alt-fill"></i> Sodo 10001</span>
+                    <span class="location-line"><i class="bi bi-geo-alt-fill"></i> New York 10001</span>
                 </div>
 
                 <!-- Search Bar -->
                 <form class="search-form mx-2" id="searchForm" onsubmit="return false;">
                     <div class="input-group">
-                        <select id="searchCategory">
-                            <option value="all">All Types</option>
+                        <select id="searchCategory" aria-label="Search category">
+                            <option value="all">All Departments</option>
                             <option value="electronics">Electronics</option>
                             <option value="clothing">Clothing</option>
                             <option value="home-kitchen">Home & Kitchen</option>
                             <option value="books">Books</option>
                             <option value="beauty">Beauty</option>
                         </select>
-                        <input type="text" id="searchInput" placeholder="Search products...">
-                        <button class="btn-search" type="button" id="searchBtn">
+                        <input type="text" id="searchInput" placeholder="Search products..." aria-label="Search products">
+                        <button class="btn-search" type="button" id="searchBtn" aria-label="Search">
                             <i class="bi bi-search"></i>
                         </button>
                     </div>
                 </form>
-
-                <!-- Language Selector -->
-                <div class="dropdown d-none d-lg-block">
-                    <button class="btn btn-link header-link dropdown-toggle" type="button" data-bs-toggle="dropdown">
-                        <i class="bi bi-globe"></i>
-                        <span class="link-title">EN</span>
-                    </button>
-                    <ul class="dropdown-menu dropdown-menu-dark">
-                        <li><a class="dropdown-item" href="#">English - EN</a></li>
-                        <li><a class="dropdown-item" href="#">Amharic - Am</a></li>
-                        <li><a class="dropdown-item" href="#">Oromifa - Or</a></li>
-                        <li><a class="dropdown-item" href="#">Wolaita - Wl</a></li>
-                    </ul>
-                </div>
 
                 <!-- Account link -->
                 <a href="pages/login.html" class="header-link d-none d-md-inline-block">
@@ -203,7 +213,7 @@
                 </a>
 
                 <!-- Cart Button -->
-                <button class="cart-btn" id="cartToggleBtn">
+                <button class="cart-btn" id="cartToggleBtn" aria-label="Open cart">
                     <i class="bi bi-cart3"></i>
                     <span class="cart-badge" id="cartBadge">0</span>
                     <span class="cart-text d-none d-lg-inline">Cart</span>
@@ -216,30 +226,13 @@
     <nav class="sub-nav">
         <div class="container-fluid px-3">
             <div class="d-flex gap-1 flex-nowrap" style="overflow-x:auto;">
-                <a href="#" class="nav-link active category-link" data-category="all">
-                    <i class="bi bi-fire"></i> Today's Deals
-                </a>
-                <a href="#" class="nav-link category-link" data-category="electronics">
-                    <i class="bi bi-phone"></i> Electronics
-                </a>
-                <a href="#" class="nav-link category-link" data-category="clothing">
-                    <i class="bi bi-handbag"></i> Clothing
-                </a>
-                <a href="#" class="nav-link category-link" data-category="home-kitchen">
-                    <i class="bi bi-house"></i> Home & Kitchen
-                </a>
-                <a href="#" class="nav-link category-link" data-category="books">
-                    <i class="bi bi-book"></i> Books
-                </a>
-                <a href="#" class="nav-link category-link" data-category="beauty">
-                    <i class="bi bi-palette"></i> Beauty
-                </a>
-                <a href="#" class="nav-link">
-                    <i class="bi bi-gift"></i> Gift Cards
-                </a>
-                <a href="pages/payment.html" class="nav-link">
-                    <i class="bi bi-credit-card"></i> Payment Methods
-                </a>
+                <a href="#" class="nav-link active category-link" data-category="all">🔥 All Deals</a>
+                <a href="#" class="nav-link category-link" data-category="electronics">📱 Electronics</a>
+                <a href="#" class="nav-link category-link" data-category="clothing">👕 Clothing</a>
+                <a href="#" class="nav-link category-link" data-category="home-kitchen">🏠 Home & Kitchen</a>
+                <a href="#" class="nav-link category-link" data-category="books">📚 Books</a>
+                <a href="#" class="nav-link category-link" data-category="beauty">💄 Beauty</a>
+                <a href="pages/payment.html" class="nav-link">💳 Payment Methods</a>
             </div>
         </div>
     </nav>
@@ -248,32 +241,18 @@
     <section class="hero-banner">
         <div class="container">
             <span class="badge bg-danger mb-3">LIMITED TIME OFFER</span>
-            <h1> Mega Sale is LIVE!</h1>
+            <h1>🚀 Mega Sale is LIVE!</h1>
             <p class="lead">Up to <strong>60% off</strong> on top brands. Free shipping on orders over $25.</p>
             <div class="d-flex justify-content-center gap-3 flex-wrap">
-                <a href="#trending-deals" class="btn-cta">Shop Now</a>
+                <a href="#trending-deals" class="btn-cta">🛍️ Shop Now</a>
                 <a href="#" class="btn btn-outline-light rounded-pill px-4">Learn More</a>
-            </div>
-            <div class="mt-4 d-flex justify-content-center gap-4 flex-wrap">
-                <div class="text-center">
-                    <h4 class="mb-0">10K+</h4>
-                    <small>Products</small>
-                </div>
-                <div class="text-center">
-                    <h4 class="mb-0">50K+</h4>
-                    <small>Happy Customers</small>
-                </div>
-                <div class="text-center">
-                    <h4 class="mb-0">4.8</h4>
-                    <small>Avg Rating</small>
-                </div>
             </div>
         </div>
     </section>
 
     <!-- ==================== FEATURED CATEGORIES ==================== -->
     <section class="container my-5">
-        <h2 class="section-title"> Shop by Category</h2>
+        <h2 class="section-title">🛍️ Shop by Category</h2>
         <div class="row g-3">
             <div class="col-6 col-md-3 col-lg-2">
                 <a href="#" class="category-card category-link" data-category="electronics">
@@ -314,11 +293,11 @@
         </div>
     </section>
 
-    <!-- ==================== PRODUCTS GRID (Dynamic - rendered by JS) ==================== -->
+    <!-- ==================== PRODUCTS GRID ==================== -->
     <main class="container my-5" id="trending-deals">
-        <h2 class="section-title"> Trending Deals</h2>
+        <h2 class="section-title">🔥 Trending Deals</h2>
         <div class="row g-3" id="productGrid">
-            <!-- Products will be rendered here by JavaScript -->
+            <!-- Rendered by JavaScript -->
         </div>
         <div id="noResults" class="text-center py-5 d-none">
             <i class="bi bi-search" style="font-size:3rem;color:#ccc;"></i>
@@ -356,85 +335,13 @@
         </div>
     </section>
 
-    <!-- ==================== NEWSLETTER SECTION ==================== -->
-    <section class="newsletter-section">
-        <div class="container">
-            <div class="row justify-content-center">
-                <div class="col-md-8 col-lg-6">
-                    <h3> Subscribe to Our Newsletter</h3>
-                    <p class="text-white-50">Get the latest deals and exclusive offers straight to your inbox.</p>
-                    <form class="d-flex gap-2" onsubmit="return false;">
-                        <input type="email" class="form-control rounded-pill" placeholder="Enter your email" required>
-                        <button class="btn btn-warning rounded-pill px-4 fw-bold" type="submit">Subscribe</button>
-                    </form>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- ==================== FOOTER ==================== -->
-    <footer class="footer-amazon">
-        <div class="container">
-            <div class="row g-4">
-                <div class="col-md-3 col-6">
-                    <h6>Get to Know Us</h6>
-                    <a href="#">About ShopMart</a>
-                    <a href="#">Careers</a>
-                    <a href="#">Press Center</a>
-                    <a href="#">Sustainability</a>
-                    <a href="#">Investor Relations</a>
-                </div>
-                <div class="col-md-3 col-6">
-                    <h6>Make Money with Us</h6>
-                    <a href="#">Sell products</a>
-                    <a href="#">Affiliate Program</a>
-                    <a href="#">Advertise Your Products</a>
-                    <a href="#">Become a Partner</a>
-                    <a href="#">Self-Publish with Us</a>
-                </div>
-                <div class="col-md-3 col-6">
-                    <h6>Payment Methods</h6>
-                    <a href="pages/payment.html"><i class="bi bi-credit-card"></i> Credit & Debit Cards</a>
-                    <a href="pages/payment.html"><i class="bi bi-paypal"></i> PayPal</a>
-                    <a href="pages/payment.html"><i class="bi bi-google"></i> Google Pay</a>
-                    <a href="pages/payment.html"><i class="bi bi-apple"></i> Apple Pay</a>
-                    <a href="#">Gift Cards</a>
-                </div>
-                <div class="col-md-3 col-6">
-                    <h6>Let Us Help You</h6>
-                    <a href="#">Customer Service</a>
-                    <a href="#">Track Your Order</a>
-                    <a href="#">Returns Center</a>
-                    <a href="#">Shipping Rates & Policies</a>
-                    <a href="#">Accessibility</a>
-                </div>
-            </div>
-            
-            <hr style="border-color:#444; margin:30px 0 20px;">
-            
-            <div class="text-center">
-                <a href="index.html" class="logo-brand" style="font-size:1.5rem;">shop<span class="dot">.</span>mart</a>
-                <div class="mt-3 d-flex justify-content-center gap-3 flex-wrap">
-                    <a href="#" class="text-muted small">Conditions of Use</a>
-                    <a href="#" class="text-muted small">Privacy Notice</a>
-                    <a href="#" class="text-muted small">Interest-Based Ads</a>
-                </div>
-                <p class="mt-2 mb-0" style="font-size:0.8rem; color:#999;">
-                 Merkato.com</p>
-            </div>
-        </div>
-    </footer>
-
-    <!-- ==================== BACK TO TOP BUTTON ==================== -->
-    <a href="#" class="back-to-top" title="Back to top">
-        <i class="bi bi-arrow-up"></i>
-    </a>
-
     <!-- ==================== CART OFFCANVAS ==================== -->
-    <div class="offcanvas offcanvas-end cart-offcanvas" tabindex="-1" id="cartOffcanvas">
+    <div class="offcanvas offcanvas-end cart-offcanvas" tabindex="-1" id="cartOffcanvas" aria-labelledby="cartLabel">
         <div class="offcanvas-header">
-            <h5 class="offcanvas-title"><i class="bi bi-cart3 me-2"></i>Shopping Cart</h5>
-            <button type="button" class="btn-close" data-bs-dismiss="offcanvas"></button>
+            <h5 class="offcanvas-title" id="cartLabel">
+                <i class="bi bi-cart3 me-2"></i>Shopping Cart
+            </h5>
+            <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
         </div>
         <div class="offcanvas-body d-flex flex-column" id="cartBody">
             <!-- Filled dynamically by JavaScript -->
@@ -442,12 +349,12 @@
     </div>
 
     <!-- ==================== PRODUCT MODAL ==================== -->
-    <div class="modal fade" id="productModal" tabindex="-1">
+    <div class="modal fade" id="productModal" tabindex="-1" aria-labelledby="modalTitle" aria-hidden="true">
         <div class="modal-dialog modal-lg modal-dialog-centered">
             <div class="modal-content rounded-4 overflow-hidden">
                 <div class="modal-header bg-light">
                     <h5 class="modal-title fw-bold" id="modalTitle">Product Details</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body" id="modalBody">
                     <!-- Filled by JavaScript -->
@@ -460,13 +367,52 @@
         </div>
     </div>
 
-    <!-- Toast Container -->
+    <!-- Toast container -->
     <div class="toast-container" id="toastContainer"></div>
 
-    <!-- Bootstrap JS Bundle -->
+    <!-- ==================== FOOTER ==================== -->
+    <footer class="footer-amazon">
+        <div class="container">
+            <div class="row g-4">
+                <div class="col-md-3 col-6">
+                    <h6>Get to Know Us</h6>
+                    <a href="#">About ShopMart</a>
+                    <a href="#">Careers</a>
+                    <a href="#">Press Center</a>
+                </div>
+                <div class="col-md-3 col-6">
+                    <h6>Make Money with Us</h6>
+                    <a href="#">Sell products</a>
+                    <a href="#">Affiliate Program</a>
+                    <a href="#">Advertise</a>
+                </div>
+                <div class="col-md-3 col-6">
+                    <h6>Payment Methods</h6>
+                    <a href="pages/payment.html"><i class="bi bi-credit-card"></i> Credit Cards</a>
+                    <a href="pages/payment.html"><i class="bi bi-paypal"></i> PayPal</a>
+                    <a href="#">Gift Cards</a>
+                </div>
+                <div class="col-md-3 col-6">
+                    <h6>Help & Support</h6>
+                    <a href="#">Customer Service</a>
+                    <a href="#">Track Order</a>
+                    <a href="#">Returns Center</a>
+                </div>
+            </div>
+            <hr style="border-color:#444; margin:30px 0 10px;">
+            <div class="text-center">
+                <span class="logo-brand" style="font-size:1.3rem;">shop<span class="dot">.</span>mart</span>
+                <p class="mt-2 mb-0" style="font-size:0.8rem; color:#999;">
+                    © 2024 ShopMart. All rights reserved. This is a demo website.
+                </p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Bootstrap JS Bundle (required for offcanvas, modal, dropdowns) -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="assets/js/auth.js"></script>
-    <!--  ShopMart Application JavaScript (External File) -->
+    
+    <!-- ShopMart Application JavaScript (external file) -->
     <script src="assets/js/app.js"></script>
 </body>
 </html>
