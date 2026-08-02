@@ -19,28 +19,38 @@
     /* ══════════════════════════════════════════════
        DESIGN TOKENS
     ══════════════════════════════════════════════ */
-    :root {
-      --c-bg:        #0d0f13;
-      --c-surface:   #161a22;
-      --c-border:    #232834;
-      --c-gold:      #e8b84b;
-      --c-gold-dim:  #c9963a;
-      --c-amber:     #ff7d2e;
-      --c-text:      #f0ebe0;
-      --c-muted:     #7a8290;
-      --c-white:     #ffffff;
-      --c-danger:    #e05252;
-      --c-success:   #3ecf8e;
-      --c-link:      #5ba4cf;
-      --radius-sm:   6px;
-      --radius-md:   12px;
-      --radius-lg:   20px;
-      --shadow-card: 0 2px 20px rgba(0,0,0,.5);
-      --shadow-glow: 0 0 40px rgba(232,184,75,.12);
-      --font-display: 'Syne', sans-serif;
-      --font-body:    'DM Sans', sans-serif;
-      --nav-h:        60px;
-    }
+  :root {
+  /* Softer, cleaner backgrounds */
+  --c-bg:        #f8fafc; /* Very light slate/gray */
+  --c-surface:   #ffffff; /* Pure white for cards/sections */
+  --c-border:    #e2e8f0; /* Subtle borders */
+  
+  /* Brand Accents - Toned down for elegance */
+  --c-brand:     #0f172a; /* Deep slate for primary buttons (looks premium) */
+  --c-brand-dim: #334155; 
+  
+  /* Text Colors - Lower contrast reduces eye strain */
+  --c-text:      #1e293b; /* Dark gray instead of harsh black */
+  --c-muted:     #64748b; /* Soft gray for secondary text */
+  
+  /* Status Colors - Softer versions */
+  --c-danger:    #ef4444;
+  --c-success:   #10b981;
+  --c-link:      #3b82f6;
+  
+  /* Structural Tokens */
+  --radius-sm:   4px;
+  --radius-md:   8px;   /* Slightly sharper corners feel more modern */
+  --radius-lg:   16px;
+  
+  /* Softer shadows replace harsh borders to reduce visual clutter */
+  --shadow-card: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+  
+  /* Fonts */
+  --font-display: 'Syne', sans-serif;
+  --font-body:    'DM Sans', sans-serif;
+  --nav-h:        64px; /* Slightly taller nav for breathing room */
+}
 
     /* ── Reset / Base ─────────────────────────────── */
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
