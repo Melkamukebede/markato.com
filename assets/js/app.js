@@ -237,19 +237,31 @@
     window.cartUpdateQty = (id, delta) => updateQuantity(id, delta);
     window.cartRemove = (id) => removeFromCart(id);
 
-    // ========== WISHLIST ==========
-    function toggleWishlist(productId) {
-        const idx = wishlist.indexOf(productId);
-        if (idx > -1) {
-            wishlist.splice(idx, 1);
-            showToast('💔 Removed from wishlist');
-        } else {
-            wishlist.push(productId);
-            showToast('❤️ Added to wishlist');
+    // ========== WISHLIST =======
+function toggleWishlist(productId) {
+    const idx = wishlist.indexOf(productId);
+    let message = '';
+    
+    if (idx > -1) {
+        wishlist.splice(idx, 1);
+        message = ' Removed from wishlist';
+        // 🆕 Sync with auth system
+        if (window.authSystem && authSystem.isLoggedIn()) {
+            authSystem.removeFromWishlist(productId);
         }
-        localStorage.setItem('shopmart_wishlist', JSON.stringify(wishlist));
-        renderProducts(); // re-render to update heart icons
+    } else {
+        wishlist.push(productId);
+        message = ' Added to wishlist';
+        // 🆕 Sync with auth system
+        if (window.authSystem && authSystem.isLoggedIn()) {
+            authSystem.addToWishlist(productId);
+        }
     }
+    
+    localStorage.setItem('shopmart_wishlist', JSON.stringify(wishlist));
+    renderProducts();
+    showToast(message);
+}
 
     // ========== PRODUCT MODAL ==========
     function openProductModal(productId) {
