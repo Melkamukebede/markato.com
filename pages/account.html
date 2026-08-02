@@ -15,9 +15,16 @@
             --amazon-mid: #232f3e;
         }
         
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        
         body {
-            font-family: 'Segoe UI', Arial, sans-serif;
+            font-family: 'Segoe UI', 'Amazon Ember', Arial, sans-serif;
             background: #eaeded;
+            min-height: 100vh;
         }
         
         .account-header {
@@ -26,18 +33,28 @@
             padding: 30px 0;
         }
         
+        .account-header h2 {
+            font-weight: 700;
+        }
+        
         .profile-card {
             background: white;
             border-radius: 12px;
-            padding: 30px;
+            padding: 25px;
             box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-            margin-top: -20px;
+            margin-bottom: 20px;
         }
         
         .nav-pills .nav-link {
             color: #333;
             border-radius: 8px;
             padding: 10px 20px;
+            margin-bottom: 5px;
+            transition: all 0.2s;
+        }
+        
+        .nav-pills .nav-link:hover {
+            background: #f0f0f0;
         }
         
         .nav-pills .nav-link.active {
@@ -59,6 +76,26 @@
             box-shadow: 0 4px 15px rgba(0,0,0,0.1);
         }
         
+        .stat-card {
+            background: white;
+            border-radius: 10px;
+            padding: 20px;
+            text-align: center;
+            border: 1px solid #e0e0e0;
+            transition: all 0.2s;
+        }
+        
+        .stat-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+        
+        .stat-card h3 {
+            color: var(--amazon-orange);
+            font-weight: 700;
+            font-size: 2rem;
+        }
+        
         .btn-logout {
             background: #dc3545;
             color: white;
@@ -68,33 +105,77 @@
             font-weight: 600;
             cursor: pointer;
             transition: all 0.2s;
+            width: 100%;
         }
         
         .btn-logout:hover {
             background: #c82333;
         }
         
-        .stat-card {
-            background: white;
-            border-radius: 10px;
-            padding: 20px;
-            text-align: center;
-            border: 1px solid #e0e0e0;
+        .loading-spinner {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 400px;
         }
         
-        .stat-card h3 {
-            color: var(--amazon-orange);
-            font-weight: 700;
+        .wishlist-item {
+            background: white;
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 10px;
+            border: 1px solid #e0e0e0;
+            display: flex;
+            gap: 15px;
+            align-items: center;
+        }
+        
+        .wishlist-item img {
+            width: 80px;
+            height: 80px;
+            object-fit: contain;
+            background: #f7f7f7;
+            border-radius: 8px;
+            padding: 5px;
+        }
+        
+        .tab-pane {
+            animation: fadeIn 0.3s ease;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        @media (max-width: 768px) {
+            .account-header {
+                padding: 20px 0;
+            }
+            
+            .wishlist-item {
+                flex-direction: column;
+                text-align: center;
+            }
+            
+            .wishlist-item img {
+                margin: 0 auto;
+            }
         }
     </style>
 </head>
 <body>
     <!-- Simple Header -->
-    <header style="background: var(--amazon-dark); padding: 10px 0;">
+    <header style="background: var(--amazon-dark); padding: 12px 0;">
         <div class="container">
-            <a href="../index.html" style="color:white;text-decoration:none;font-size:1.5rem;font-weight:800;">
-                shop<span style="color:#febd69;">.</span>mart
-            </a>
+            <div class="d-flex justify-content-between align-items-center">
+                <a href="../index.html" style="color:white;text-decoration:none;font-size:1.5rem;font-weight:800;">
+                    shop<span style="color:#febd69;">.</span>mart
+                </a>
+                <button class="btn btn-outline-light btn-sm" onclick="handleLogout()">
+                    <i class="bi bi-box-arrow-right me-1"></i> Sign Out
+                </button>
+            </div>
         </div>
     </header>
     
@@ -102,136 +183,173 @@
     <div class="account-header">
         <div class="container">
             <h2><i class="bi bi-person-circle me-2"></i> Your Account</h2>
-            <p>Welcome back, <span id="userName">User</span></p>
+            <p class="mb-0" id="userGreeting">Loading...</p>
         </div>
     </div>
     
-    <div class="container py-4">
-        <div class="row">
-            <!-- Sidebar -->
-            <div class="col-md-3 mb-4">
-                <div class="nav flex-column nav-pills" id="accountTabs">
-                    <button class="nav-link active" data-bs-toggle="pill" data-bs-target="#overview">
-                        <i class="bi bi-speedometer2 me-2"></i> Overview
-                    </button>
-                    <button class="nav-link" data-bs-toggle="pill" data-bs-target="#profile">
-                        <i class="bi bi-person me-2"></i> Profile
-                    </button>
-                    <button class="nav-link" data-bs-toggle="pill" data-bs-target="#orders">
-                        <i class="bi bi-box me-2"></i> Your Orders
-                    </button>
-                    <button class="nav-link" data-bs-toggle="pill" data-bs-target="#wishlist">
-                        <i class="bi bi-heart me-2"></i> Wishlist
-                    </button>
-                    <button class="nav-link" data-bs-toggle="pill" data-bs-target="#settings">
-                        <i class="bi bi-gear me-2"></i> Settings
-                    </button>
-                    <hr>
-                    <button class="btn btn-logout" onclick="handleLogout()">
-                        <i class="bi bi-box-arrow-right me-2"></i> Sign Out
-                    </button>
-                </div>
+    <!-- Loading Spinner -->
+    <div id="loadingSpinner" class="loading-spinner">
+        <div class="text-center">
+            <div class="spinner-border text-warning" role="status" style="width:3rem;height:3rem;">
+                <span class="visually-hidden">Loading...</span>
             </div>
-            
-            <!-- Content -->
-            <div class="col-md-9">
-                <div class="tab-content">
-                    <!-- Overview -->
-                    <div class="tab-pane fade show active" id="overview">
-                        <h4>Account Overview</h4>
-                        <div class="row g-3 mt-2">
-                            <div class="col-md-4">
-                                <div class="stat-card">
-                                    <i class="bi bi-box" style="font-size:2rem;color:var(--amazon-orange);"></i>
-                                    <h3 id="orderCount">0</h3>
-                                    <p class="text-muted">Total Orders</p>
+            <p class="mt-3 text-muted">Loading your account...</p>
+        </div>
+    </div>
+    
+    <!-- Main Content (Hidden until loaded) -->
+    <div id="mainContent" style="display:none;">
+        <div class="container py-4">
+            <div class="row">
+                <!-- Sidebar -->
+                <div class="col-md-3 mb-4">
+                    <div class="nav flex-column nav-pills" id="accountTabs" role="tablist">
+                        <button class="nav-link active" id="overview-tab" data-bs-toggle="pill" data-bs-target="#overview" type="button" role="tab">
+                            <i class="bi bi-speedometer2 me-2"></i> Overview
+                        </button>
+                        <button class="nav-link" id="profile-tab" data-bs-toggle="pill" data-bs-target="#profile" type="button" role="tab">
+                            <i class="bi bi-person me-2"></i> Profile
+                        </button>
+                        <button class="nav-link" id="orders-tab" data-bs-toggle="pill" data-bs-target="#orders" type="button" role="tab">
+                            <i class="bi bi-box me-2"></i> Your Orders
+                        </button>
+                        <button class="nav-link" id="wishlist-tab" data-bs-toggle="pill" data-bs-target="#wishlist" type="button" role="tab">
+                            <i class="bi bi-heart me-2"></i> Wishlist
+                        </button>
+                        <button class="nav-link" id="settings-tab" data-bs-toggle="pill" data-bs-target="#settings" type="button" role="tab">
+                            <i class="bi bi-gear me-2"></i> Settings
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- Content -->
+                <div class="col-md-9">
+                    <div class="tab-content">
+                        <!-- Overview Tab -->
+                        <div class="tab-pane fade show active" id="overview" role="tabpanel">
+                            <h4 class="mb-4">Account Overview</h4>
+                            <div class="row g-3">
+                                <div class="col-md-4">
+                                    <div class="stat-card">
+                                        <i class="bi bi-box" style="font-size:2rem;color:var(--amazon-orange);"></i>
+                                        <h3 id="orderCount">0</h3>
+                                        <p class="text-muted mb-0">Total Orders</p>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="stat-card">
+                                        <i class="bi bi-heart" style="font-size:2rem;color:#e74c3c;"></i>
+                                        <h3 id="wishlistCount">0</h3>
+                                        <p class="text-muted mb-0">Wishlist Items</p>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="stat-card">
+                                        <i class="bi bi-calendar-check" style="font-size:2rem;color:#28a745;"></i>
+                                        <h3 id="memberSince">-</h3>
+                                        <p class="text-muted mb-0">Member Since</p>
+                                    </div>
                                 </div>
                             </div>
-                            <div class="col-md-4">
-                                <div class="stat-card">
-                                    <i class="bi bi-heart" style="font-size:2rem;color:#e74c3c;"></i>
-                                    <h3 id="wishlistCount">0</h3>
-                                    <p class="text-muted">Wishlist Items</p>
+                            
+                            <!-- Quick Links -->
+                            <div class="row g-3 mt-3">
+                                <div class="col-md-6">
+                                    <div class="profile-card text-center">
+                                        <i class="bi bi-cart3" style="font-size:2rem;color:var(--amazon-orange);"></i>
+                                        <h5 class="mt-2">Continue Shopping</h5>
+                                        <a href="../index.html" class="btn btn-warning fw-bold mt-2">
+                                            Browse Products
+                                        </a>
+                                    </div>
                                 </div>
-                            </div>
-                            <div class="col-md-4">
-                                <div class="stat-card">
-                                    <i class="bi bi-calendar-check" style="font-size:2rem;color:#28a745;"></i>
-                                    <h3 id="memberSince">-</h3>
-                                    <p class="text-muted">Member Since</p>
+                                <div class="col-md-6">
+                                    <div class="profile-card text-center">
+                                        <i class="bi bi-heart" style="font-size:2rem;color:#e74c3c;"></i>
+                                        <h5 class="mt-2">Your Wishlist</h5>
+                                        <button class="btn btn-outline-danger fw-bold mt-2" onclick="document.getElementById('wishlist-tab').click()">
+                                            View Wishlist
+                                        </button>
+                                    </div>
                                 </div>
                             </div>
                         </div>
-                    </div>
-                    
-                    <!-- Profile -->
-                    <div class="tab-pane fade" id="profile">
-                        <div class="profile-card">
-                            <h4>Profile Information</h4>
-                            <form id="profileForm" onsubmit="return false;">
-                                <div class="mb-3">
-                                    <label class="form-label">Display Name</label>
-                                    <input type="text" class="form-control" id="profileName">
-                                </div>
-                                <div class="mb-3">
-                                    <label class="form-label">Email</label>
-                                    <input type="email" class="form-control" id="profileEmail" readonly>
-                                </div>
-                                <div class="mb-3">
-                                    <label class="form-label">Phone</label>
-                                    <input type="tel" class="form-control" id="profilePhone">
-                                </div>
-                                <div class="mb-3">
-                                    <label class="form-label">Address</label>
-                                    <textarea class="form-control" id="profileAddress" rows="3"></textarea>
-                                </div>
-                                <button type="submit" class="btn btn-warning fw-bold px-4">
-                                    Update Profile
+                        
+                        <!-- Profile Tab -->
+                        <div class="tab-pane fade" id="profile" role="tabpanel">
+                            <div class="profile-card">
+                                <h4>Profile Information</h4>
+                                <form id="profileForm" onsubmit="return false;">
+                                    <div class="mb-3">
+                                        <label class="form-label fw-bold">Display Name</label>
+                                        <input type="text" class="form-control" id="profileName" required>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label class="form-label fw-bold">Email</label>
+                                        <input type="email" class="form-control" id="profileEmail" readonly>
+                                        <small class="text-muted">Email cannot be changed</small>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label class="form-label fw-bold">Phone Number</label>
+                                        <input type="tel" class="form-control" id="profilePhone" placeholder="+1 234-567-8900">
+                                    </div>
+                                    <div class="mb-3">
+                                        <label class="form-label fw-bold">Shipping Address</label>
+                                        <textarea class="form-control" id="profileAddress" rows="3" placeholder="Enter your address"></textarea>
+                                    </div>
+                                    <button type="submit" class="btn btn-warning fw-bold px-4">
+                                        <i class="bi bi-check2 me-2"></i> Update Profile
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+                        
+                        <!-- Orders Tab -->
+                        <div class="tab-pane fade" id="orders" role="tabpanel">
+                            <h4 class="mb-4">Your Orders</h4>
+                            <div id="ordersList">
+                                <!-- Dynamically filled -->
+                            </div>
+                        </div>
+                        
+                        <!-- Wishlist Tab -->
+                        <div class="tab-pane fade" id="wishlist" role="tabpanel">
+                            <h4 class="mb-4">Your Wishlist</h4>
+                            <div id="wishlistItems">
+                                <!-- Dynamically filled -->
+                            </div>
+                        </div>
+                        
+                        <!-- Settings Tab -->
+                        <div class="tab-pane fade" id="settings" role="tabpanel">
+                            <div class="profile-card">
+                                <h4>Change Password</h4>
+                                <form onsubmit="return false;">
+                                    <div class="mb-3">
+                                        <label class="form-label fw-bold">Current Password</label>
+                                        <input type="password" class="form-control" placeholder="Enter current password">
+                                    </div>
+                                    <div class="mb-3">
+                                        <label class="form-label fw-bold">New Password</label>
+                                        <input type="password" class="form-control" placeholder="Enter new password (min 6 characters)">
+                                    </div>
+                                    <div class="mb-3">
+                                        <label class="form-label fw-bold">Confirm New Password</label>
+                                        <input type="password" class="form-control" placeholder="Re-enter new password">
+                                    </div>
+                                    <button type="submit" class="btn btn-warning fw-bold px-4">
+                                        <i class="bi bi-shield-lock me-2"></i> Update Password
+                                    </button>
+                                </form>
+                            </div>
+                            
+                            <div class="profile-card mt-4">
+                                <h4 class="text-danger">Danger Zone</h4>
+                                <p class="text-muted">Once you delete your account, there is no going back. Please be certain.</p>
+                                <button class="btn btn-outline-danger" onclick="alert('Account deletion is disabled in demo mode.')">
+                                    <i class="bi bi-trash me-2"></i> Delete Account
                                 </button>
-                            </form>
-                        </div>
-                    </div>
-                    
-                    <!-- Orders -->
-                    <div class="tab-pane fade" id="orders">
-                        <h4>Your Orders</h4>
-                        <div id="ordersList">
-                            <div class="order-card">
-                                <p class="text-muted text-center py-4">
-                                    <i class="bi bi-inbox" style="font-size:3rem;"></i><br>
-                                    No orders yet
-                                </p>
                             </div>
-                        </div>
-                    </div>
-                    
-                    <!-- Wishlist -->
-                    <div class="tab-pane fade" id="wishlist">
-                        <h4>Your Wishlist</h4>
-                        <div id="wishlistItems">
-                            <p class="text-muted text-center py-4">
-                                <i class="bi bi-heart" style="font-size:3rem;"></i><br>
-                                Your wishlist is empty
-                            </p>
-                        </div>
-                    </div>
-                    
-                    <!-- Settings -->
-                    <div class="tab-pane fade" id="settings">
-                        <h4>Account Settings</h4>
-                        <div class="profile-card">
-                            <h5>Change Password</h5>
-                            <form onsubmit="return false;">
-                                <div class="mb-3">
-                                    <label class="form-label">Current Password</label>
-                                    <input type="password" class="form-control">
-                                </div>
-                                <div class="mb-3">
-                                    <label class="form-label">New Password</label>
-                                    <input type="password" class="form-control">
-                                </div>
-                                <button type="submit" class="btn btn-warning fw-bold px-4">Update Password</button>
-                            </form>
                         </div>
                     </div>
                 </div>
@@ -239,162 +357,336 @@
         </div>
     </div>
 
+    <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- Auth System -->
     <script src="../assets/js/auth.js"></script>
     
     <script>
-        // Check authentication
-        window.addEventListener('DOMContentLoaded', () => {
-            if (!authSystem.isLoggedIn()) {
+        // ============================================
+        // Account Page Logic (Fixed)
+        // ============================================
+        
+        let isPageReady = false;
+        
+        // Wait for everything to load
+        window.addEventListener('DOMContentLoaded', async () => {
+            console.log('📄 Account page loaded');
+            
+            // Wait for auth system to initialize
+            await waitForAuth();
+            
+            // Check authentication
+            if (!authSystem || !authSystem.isLoggedIn()) {
+                console.log('❌ Not logged in, redirecting...');
                 window.location.href = 'login.html';
                 return;
             }
             
+            // Page is ready
+            isPageReady = true;
+            
+            // Hide loading, show content
+            document.getElementById('loadingSpinner').style.display = 'none';
+            document.getElementById('mainContent').style.display = 'block';
+            
             // Load user data
             loadUserData();
+            
+            // Handle hash navigation
+            handleHashNavigation();
+            
+            console.log('✅ Account page ready');
         });
         
-        // In the <script> section of account.html, update loadUserData():
-
-function loadUserData() {
-    const user = authSystem.getCurrentUser();
-    if (!user) return;
-    
-    // Update header
-    document.getElementById('userName').textContent = user.displayName;
-    
-    // 🆕 Get fresh data from auth system
-    const orders = authSystem.getOrders();
-    const wishlist = authSystem.getWishlist();
-    
-    // Update stats
-    document.getElementById('orderCount').textContent = orders.length;
-    document.getElementById('wishlistCount').textContent = wishlist.length;
-    
-    if (user.joinedDate) {
-        document.getElementById('memberSince').textContent = user.joinedDate.substring(0, 4);
-    }
-    
-    // Update profile form
-    document.getElementById('profileName').value = user.displayName || '';
-    document.getElementById('profileEmail').value = user.email || '';
-    document.getElementById('profilePhone').value = user.phone || '';
-    document.getElementById('profileAddress').value = user.address || '';
-    
-    // 🆕 Render orders
-    renderOrders(orders);
-    
-    // 🆕 Render wishlist
-    renderWishlist(wishlist);
-}
-
-// 🆕 Render orders list
-function renderOrders(orders) {
-    const ordersList = document.getElementById('ordersList');
-    
-    if (!orders || orders.length === 0) {
-        ordersList.innerHTML = `
-            <div class="order-card">
-                <p class="text-muted text-center py-4">
-                    <i class="bi bi-inbox" style="font-size:3rem;"></i><br>
-                    No orders yet
-                </p>
-                <div class="text-center">
-                    <a href="../index.html" class="btn btn-warning fw-bold px-4">
-                        Start Shopping
-                    </a>
-                </div>
-            </div>`;
-        return;
-    }
-    
-    ordersList.innerHTML = orders.map(order => `
-        <div class="order-card">
-            <div class="d-flex justify-content-between align-items-start">
-                <div>
-                    <h6>Order #${order.id}</h6>
-                    <small class="text-muted">${new Date(order.date).toLocaleDateString()}</small>
-                    <p class="mt-2 mb-1"><strong>Total: $${order.total.toFixed(2)}</strong></p>
-                    <span class="badge bg-success">${order.status || 'Processing'}</span>
-                </div>
-                <div>
-                    <small class="text-muted">${order.items ? order.items.length : 0} items</small>
-                </div>
-            </div>
-        </div>
-    `).join('');
-}
-
-// 🆕 Render wishlist items
-function renderWishlist(wishlistItems) {
-    const wishlistContainer = document.getElementById('wishlistItems');
-    
-    if (!wishlistItems || wishlistItems.length === 0) {
-        wishlistContainer.innerHTML = `
-            <p class="text-muted text-center py-4">
-                <i class="bi bi-heart" style="font-size:3rem;"></i><br>
-                Your wishlist is empty
-            </p>
-            <div class="text-center">
-                <a href="../index.html" class="btn btn-warning fw-bold px-4">
-                    Browse Products
-                </a>
-            </div>`;
-        return;
-    }
-    
-    // Load products data to display wishlist items
-    fetch('../data/products.json')
-        .then(response => response.json())
-        .then(products => {
-            const wishlistProducts = products.filter(p => wishlistItems.includes(p.id));
+        // Wait for auth system to be ready
+        function waitForAuth() {
+            return new Promise((resolve) => {
+                // Check if authSystem exists and has initialized
+                if (window.authSystem && window.authSystem.isLoggedIn !== undefined) {
+                    resolve();
+                    return;
+                }
+                
+                // Wait for it
+                let attempts = 0;
+                const maxAttempts = 50; // 5 seconds max
+                const interval = setInterval(() => {
+                    attempts++;
+                    
+                    if (window.authSystem && window.authSystem.isLoggedIn !== undefined) {
+                        clearInterval(interval);
+                        resolve();
+                    } else if (attempts >= maxAttempts) {
+                        clearInterval(interval);
+                        console.warn('⚠️ Auth system timeout');
+                        resolve(); // Resolve anyway to prevent hanging
+                    }
+                }, 100);
+            });
+        }
+        
+        // Handle hash navigation
+        function handleHashNavigation() {
+            const hash = window.location.hash;
+            if (hash) {
+                const tabId = hash.replace('#', '');
+                const tabButton = document.querySelector(`[data-bs-target="#${tabId}"]`);
+                if (tabButton) {
+                    // Use Bootstrap's tab method
+                    const tab = new bootstrap.Tab(tabButton);
+                    tab.show();
+                }
+            }
             
-            wishlistContainer.innerHTML = wishlistProducts.map(p => `
-                <div class="order-card d-flex gap-3 align-items-center">
-                    <img src="${p.image}" alt="${p.name}" style="width:80px;height:80px;object-fit:contain;background:#f7f7f7;border-radius:8px;padding:5px;">
-                    <div class="flex-grow-1">
-                        <h6>${p.name}</h6>
-                        <p class="text-muted mb-1">$${p.price.toFixed(2)}</p>
-                        <div class="rating">
-                            ${generateStars(p.rating)}
-                            <small class="text-primary">(${p.reviews})</small>
+            // Listen for hash changes
+            window.addEventListener('hashchange', () => {
+                const newHash = window.location.hash;
+                if (newHash) {
+                    const tabId = newHash.replace('#', '');
+                    const tabButton = document.querySelector(`[data-bs-target="#${tabId}"]`);
+                    if (tabButton) {
+                        const tab = new bootstrap.Tab(tabButton);
+                        tab.show();
+                    }
+                }
+            });
+        }
+        
+        // Load user data
+        function loadUserData() {
+            const user = authSystem.getCurrentUser();
+            if (!user) {
+                console.error('❌ No user data found');
+                return;
+            }
+            
+            console.log('👤 Loading data for:', user.displayName);
+            
+            // Update greeting
+            document.getElementById('userGreeting').textContent = 
+                `Welcome back, ${user.displayName}`;
+            
+            // Get fresh data
+            const orders = authSystem.getOrders ? authSystem.getOrders() : [];
+            const wishlist = authSystem.getWishlist ? authSystem.getWishlist() : [];
+            
+            // Update stats
+            document.getElementById('orderCount').textContent = orders.length;
+            document.getElementById('wishlistCount').textContent = wishlist.length;
+            
+            if (user.joinedDate) {
+                const year = user.joinedDate.substring(0, 4);
+                document.getElementById('memberSince').textContent = year;
+            }
+            
+            // Update profile form
+            document.getElementById('profileName').value = user.displayName || '';
+            document.getElementById('profileEmail').value = user.email || '';
+            document.getElementById('profilePhone').value = user.phone || '';
+            document.getElementById('profileAddress').value = user.address || '';
+            
+            // Render orders and wishlist
+            renderOrders(orders);
+            renderWishlist(wishlist);
+        }
+        
+        // Render orders
+        function renderOrders(orders) {
+            const container = document.getElementById('ordersList');
+            
+            if (!orders || orders.length === 0) {
+                container.innerHTML = `
+                    <div class="profile-card text-center py-5">
+                        <i class="bi bi-inbox" style="font-size:4rem;color:#ccc;"></i>
+                        <h5 class="mt-3">No orders yet</h5>
+                        <p class="text-muted">Start shopping to see your orders here!</p>
+                        <a href="../index.html" class="btn btn-warning fw-bold px-4 mt-2">
+                            <i class="bi bi-cart me-2"></i> Start Shopping
+                        </a>
+                    </div>`;
+                return;
+            }
+            
+            container.innerHTML = orders.map((order, index) => `
+                <div class="order-card">
+                    <div class="d-flex justify-content-between align-items-start flex-wrap">
+                        <div>
+                            <h6 class="mb-1">Order #${order.id || ('ORD' + (index + 1))}</h6>
+                            <small class="text-muted">
+                                <i class="bi bi-calendar me-1"></i>
+                                ${order.date ? new Date(order.date).toLocaleDateString('en-US', {
+                                    year: 'numeric',
+                                    month: 'long',
+                                    day: 'numeric'
+                                }) : 'Recent'}
+                            </small>
+                            <p class="mt-2 mb-1">
+                                <strong>Total: $${order.total ? order.total.toFixed(2) : '0.00'}</strong>
+                            </p>
+                            <span class="badge bg-success">${order.status || 'Processing'}</span>
+                        </div>
+                        <div class="text-end">
+                            <small class="text-muted">
+                                ${order.items ? order.items.length : 0} item(s)
+                            </small>
+                            <br>
+                            <button class="btn btn-sm btn-outline-primary mt-2" 
+                                    onclick="alert('Order details coming soon!')">
+                                View Details
+                            </button>
                         </div>
                     </div>
-                    <button class="btn btn-sm btn-outline-danger" onclick="removeFromWishlist(${p.id})">
-                        <i class="bi bi-trash"></i>
-                    </button>
                 </div>
             `).join('');
-        })
-        .catch(() => {
-            wishlistContainer.innerHTML = '<p class="text-muted text-center">Unable to load wishlist items</p>';
-        });
-}
-
-// 🆕 Helper: Generate stars (same as in app.js)
-function generateStars(rating) {
-    const full = Math.floor(rating);
-    const half = rating % 1 >= 0.5 ? 1 : 0;
-    const empty = 5 - full - half;
-    let html = '';
-    for (let i = 0; i < full; i++) html += '<i class="bi bi-star-fill"></i>';
-    if (half) html += '<i class="bi bi-star-half"></i>';
-    for (let i = 0; i < empty; i++) html += '<i class="bi bi-star"></i>';
-    return html;
-}
-
-// 🆕 Remove from wishlist (from account page)
-function removeFromWishlist(productId) {
-    if (authSystem.removeFromWishlist(productId)) {
-        alert('Item removed from wishlist');
-        loadUserData(); // Refresh the page
-    }
-}
-        function handleLogout() {
-            if (confirm('Are you sure you want to logout?')) {
-                authSystem.logout();
+        }
+        
+        // Render wishlist
+        function renderWishlist(wishlistItems) {
+            const container = document.getElementById('wishlistItems');
+            
+            if (!wishlistItems || wishlistItems.length === 0) {
+                container.innerHTML = `
+                    <div class="profile-card text-center py-5">
+                        <i class="bi bi-heart" style="font-size:4rem;color:#ccc;"></i>
+                        <h5 class="mt-3">Your wishlist is empty</h5>
+                        <p class="text-muted">Save items you love to your wishlist!</p>
+                        <a href="../index.html" class="btn btn-warning fw-bold px-4 mt-2">
+                            <i class="bi bi-bag me-2"></i> Browse Products
+                        </a>
+                    </div>`;
+                return;
+            }
+            
+            // Try to load products from JSON
+            fetch('../data/products.json')
+                .then(response => {
+                    if (!response.ok) throw new Error('Failed to load products');
+                    return response.json();
+                })
+                .then(products => {
+                    const wishlistProducts = products.filter(p => wishlistItems.includes(p.id));
+                    
+                    if (wishlistProducts.length === 0) {
+                        container.innerHTML = `
+                            <div class="profile-card text-center py-5">
+                                <i class="bi bi-question-circle" style="font-size:4rem;color:#ccc;"></i>
+                                <h5 class="mt-3">Products not found</h5>
+                                <p class="text-muted">Some wishlist items may no longer be available.</p>
+                            </div>`;
+                        return;
+                    }
+                    
+                    container.innerHTML = wishlistProducts.map(p => `
+                        <div class="wishlist-item">
+                            <img src="${p.image}" alt="${p.name}" 
+                                 onerror="this.src='https://via.placeholder.com/80/f7f7f7/888?text=N/A'">
+                            <div class="flex-grow-1">
+                                <h6 class="mb-1">${p.name}</h6>
+                                <div class="text-warning mb-1">
+                                    ${generateStars(p.rating)}
+                                    <small class="text-primary ms-1">(${p.reviews.toLocaleString()})</small>
+                                </div>
+                                <p class="mb-1">
+                                    <strong>$${p.price.toFixed(2)}</strong>
+                                    ${p.mrp > p.price ? `<span class="text-muted text-decoration-line-through ms-2">$${p.mrp.toFixed(2)}</span>` : ''}
+                                </p>
+                                ${p.prime ? '<span class="badge bg-info">PRIME</span>' : ''}
+                            </div>
+                            <div class="d-flex gap-2">
+                                <button class="btn btn-warning btn-sm" 
+                                        onclick="window.location.href='../index.html'">
+                                    <i class="bi bi-cart-plus"></i>
+                                </button>
+                                <button class="btn btn-outline-danger btn-sm" 
+                                        onclick="removeFromWishlist(${p.id})">
+                                    <i class="bi bi-trash"></i>
+                                </button>
+                            </div>
+                        </div>
+                    `).join('');
+                })
+                .catch(error => {
+                    console.warn('Could not load products:', error);
+                    container.innerHTML = `
+                        <div class="profile-card text-center py-4">
+                            <p class="text-muted">Unable to load product details</p>
+                            <p><strong>${wishlistItems.length} items</strong> in your wishlist</p>
+                            <a href="../index.html" class="btn btn-warning fw-bold">Browse Products</a>
+                        </div>`;
+                });
+        }
+        
+        // Generate star rating HTML
+        function generateStars(rating) {
+            const full = Math.floor(rating);
+            const half = rating % 1 >= 0.5 ? 1 : 0;
+            const empty = 5 - full - half;
+            let html = '';
+            for (let i = 0; i < full; i++) html += '<i class="bi bi-star-fill"></i>';
+            if (half) html += '<i class="bi bi-star-half"></i>';
+            for (let i = 0; i < empty; i++) html += '<i class="bi bi-star"></i>';
+            return html;
+        }
+        
+        // Remove from wishlist
+        function removeFromWishlist(productId) {
+            if (confirm('Remove this item from your wishlist?')) {
+                if (authSystem.removeFromWishlist) {
+                    authSystem.removeFromWishlist(productId);
+                }
+                // Reload data
+                loadUserData();
+                // Show success message
+                alert('Item removed from wishlist');
             }
         }
+        
+        // Handle profile update
+        document.getElementById('profileForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const updates = {
+                displayName: document.getElementById('profileName').value.trim(),
+                phone: document.getElementById('profilePhone').value.trim(),
+                address: document.getElementById('profileAddress').value.trim()
+            };
+            
+            if (!updates.displayName) {
+                alert('Display name is required');
+                return;
+            }
+            
+            if (authSystem.updateProfile) {
+                const success = authSystem.updateProfile(updates);
+                if (success) {
+                    alert('✅ Profile updated successfully!');
+                    loadUserData();
+                } else {
+                    alert('❌ Failed to update profile');
+                }
+            }
+        });
+        
+        // Handle logout
+        function handleLogout() {
+            if (confirm('Are you sure you want to sign out?')) {
+                if (authSystem.logout) {
+                    authSystem.logout();
+                }
+            }
+        }
+        
+        // Prevent accidental navigation away
+        window.addEventListener('beforeunload', (e) => {
+            if (!isPageReady) {
+                // Page still loading, allow navigation
+                return;
+            }
+        });
+        
+        console.log('✅ Account page scripts loaded');
     </script>
 </body>
 </html>
