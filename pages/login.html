@@ -4,447 +4,101 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ShopMart - Sign In</title>
-    
-    <!-- Bootstrap 5 CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-    <!-- Bootstrap Icons -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
-    
     <style>
-        :root {
-            --amazon-dark: #131921;
-            --amazon-orange: #febd69;
-            --amazon-yellow: #f3a847;
+        :root { --amazon-dark:#131921; --amazon-mid:#232f3e; --amazon-orange:#febd69; --amazon-link:#007185; }
+        body { background: #f3f3f3; font-family: Arial, sans-serif; }
+        .header-top { background: var(--amazon-dark); padding: 10px 0; text-align: center; }
+        .logo-brand { color: #fff; font-size: 1.6rem; font-weight: 800; text-decoration: none; letter-spacing: -1px; }
+        .logo-brand .dot { color: var(--amazon-orange); }
+        .auth-card {
+            background: #fff; border: 1px solid #ddd; border-radius: 8px;
+            padding: 28px 28px 22px; width: 100%; max-width: 360px; margin: 28px auto;
         }
-        
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-        }
-        
-        body {
-            background: linear-gradient(135deg, #eaeded 0%, #d5dbdb 100%);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            min-height: 100vh;
-            padding: 20px;
-            font-family: 'Segoe UI', 'Amazon Ember', Arial, sans-serif;
-        }
-        
-        .login-container {
-            width: 100%;
-            max-width: 420px;
-        }
-        
-        .login-card {
-            background: #ffffff;
-            border-radius: 12px;
-            padding: 30px;
-            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
-            border: 1px solid #e0e0e0;
-        }
-        
-        .logo-brand {
-            font-size: 2rem;
-            font-weight: 800;
-            color: var(--amazon-dark);
-            text-decoration: none;
-            text-align: center;
-            display: block;
-            margin-bottom: 25px;
-            letter-spacing: -0.5px;
-            transition: all 0.2s;
-        }
-        
-        .logo-brand:hover {
-            color: var(--amazon-orange);
-            transform: scale(1.05);
-        }
-        
-        .logo-brand .dot {
-            color: var(--amazon-orange);
-        }
-        
-        .login-card h4 {
-            font-weight: 600;
-            margin-bottom: 20px;
-            color: #0f1111;
-        }
-        
-        .form-label {
-            font-weight: 600;
-            font-size: 0.85rem;
-            color: #0f1111;
-            margin-bottom: 4px;
-        }
-        
-        .form-control {
-            border: 1.5px solid #a6a6a6;
-            border-radius: 6px;
-            padding: 10px 12px;
-            font-size: 0.9rem;
-            transition: all 0.2s ease;
-        }
-        
-        .form-control:focus {
-            border-color: var(--amazon-orange);
-            box-shadow: 0 0 0 3px rgba(254, 189, 105, 0.3);
-            outline: none;
-        }
-        
+        .auth-card h4 { font-size: 1.2rem; font-weight: 700; margin-bottom: 18px; }
+        .form-label { font-size: 0.85rem; font-weight: 600; }
+        .form-control { font-size: 0.9rem; border-radius: 6px; }
+        .form-control:focus { box-shadow: 0 0 0 3px rgba(255,153,0,.3); border-color: #e77600; }
         .btn-signin {
-            background: var(--amazon-orange);
-            border: none;
-            font-weight: 600;
-            padding: 12px;
-            border-radius: 8px;
-            font-size: 0.95rem;
-            transition: all 0.2s ease;
-            color: #1a1a1a;
-            width: 100%;
-            cursor: pointer;
+            background: linear-gradient(to bottom, #f7dfa5, #f0c14b);
+            border: 1px solid #a88734;
+            color: #111; font-weight: 600; border-radius: 6px; padding: 8px;
+            width: 100%; cursor: pointer; font-size: 0.95rem;
         }
-        
-        .btn-signin:hover {
-            background: var(--amazon-yellow);
-            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.15);
-        }
-        
-        .btn-signin:active {
-            transform: scale(0.98);
-        }
-        
-        .btn-signin:disabled {
-            opacity: 0.6;
-            cursor: not-allowed;
-        }
-        
-        /* Alert Messages */
-        .alert {
-            padding: 12px 16px;
-            border-radius: 8px;
-            margin-bottom: 15px;
-            font-size: 0.85rem;
-            display: none;
-        }
-        
-        .alert-danger {
-            background: #fce4e4;
-            color: #cc0c39;
-            border: 1px solid #f5c6cb;
-        }
-        
-        .alert-success {
-            background: #d4edda;
-            color: #155724;
-            border: 1px solid #c3e6cb;
-        }
-        
-        .alert-info {
-            background: #d1ecf1;
-            color: #0c5460;
-            border: 1px solid #bee5eb;
-        }
-        
-        /* Divider */
-        .divider {
-            display: flex;
-            align-items: center;
-            text-align: center;
-            margin: 20px 0;
-            color: #767676;
-            font-size: 0.8rem;
-        }
-        
-        .divider::before,
-        .divider::after {
-            content: '';
-            flex: 1;
-            border-bottom: 1px solid #e0e0e0;
-        }
-        
-        .divider span {
-            padding: 0 15px;
-            background: #fff;
-        }
-        
-        /* Social Buttons */
-        .btn-social {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 10px;
-            width: 100%;
-            padding: 12px;
-            border: 1.5px solid #d0d0d0;
-            border-radius: 8px;
-            font-weight: 600;
-            font-size: 0.9rem;
-            background: #ffffff;
-            cursor: pointer;
-            transition: all 0.2s ease;
-            margin-bottom: 10px;
-            color: #333;
-        }
-        
-        .btn-social:hover {
-            background: #f7f7f7;
-            border-color: #a0a0a0;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-            transform: translateY(-1px);
-        }
-        
-        .btn-google { border-color: #4285f4; color: #4285f4; }
-        .btn-facebook { border-color: #1877f2; color: #1877f2; }
-        .btn-github { border-color: #333333; color: #333333; }
-        .btn-microsoft { border-color: #00a4ef; color: #00a4ef; }
-        
-        .btn-social i { font-size: 1.2rem; }
-        
-        .forgot-link {
-            color: #0066c0;
-            text-decoration: none;
-            font-size: 0.85rem;
-        }
-        
-        .forgot-link:hover {
-            color: #c45500;
-            text-decoration: underline;
-        }
-        
-        .create-account-link {
-            color: #0066c0;
-            text-decoration: none;
-            font-weight: 500;
-        }
-        
-        .create-account-link:hover {
-            color: #c45500;
-            text-decoration: underline;
-        }
-        
-        /* Loading Spinner */
-        .spinner-border-sm {
-            width: 1rem;
-            height: 1rem;
-            border-width: 0.15em;
-        }
-        
-        @media (max-width: 480px) {
-            .login-card {
-                padding: 20px 16px;
-            }
-        }
+        .btn-signin:hover { background: linear-gradient(to bottom, #f5d78e, #eeb933); }
+        .divider { display: flex; align-items: center; gap: 10px; margin: 18px 0; color: #777; font-size: 0.8rem; }
+        .divider::before, .divider::after { content: ''; flex: 1; height: 1px; background: #ddd; }
+        .btn-social { display: flex; align-items: center; justify-content: center; gap: 8px; width: 100%; border: 1px solid #ccc; border-radius: 6px; background: #fff; padding: 8px; font-size: 0.85rem; cursor: pointer; margin-bottom: 8px; color: #333; font-weight: 500; }
+        .btn-social:hover { background: #f7f7f7; border-color: #999; }
+        .demo-hint { background: #fffbee; border: 1px solid #ffe082; border-radius: 6px; padding: 10px 14px; font-size: 0.8rem; color: #555; margin-bottom: 16px; }
+        .auth-footer { border-top: 1px solid #eee; margin-top: 18px; padding-top: 14px; text-align: center; font-size: 0.82rem; color: #555; }
+        .auth-footer a { color: var(--amazon-link); text-decoration: none; font-weight: 600; }
+        .auth-footer a:hover { text-decoration: underline; }
+        .page-footer { text-align: center; font-size: 0.75rem; color: #888; padding: 20px; }
+        .page-footer a { color: #555; text-decoration: none; margin: 0 8px; }
+        .page-footer a:hover { text-decoration: underline; }
+        .forgot-link { font-size: 0.8rem; color: var(--amazon-link); text-decoration: none; }
+        .forgot-link:hover { text-decoration: underline; }
     </style>
 </head>
 <body>
-    <div class="login-container">
-        <!-- Logo -->
-        <a href="../index.html" class="logo-brand">
-            shop<span class="dot">.</span>mart
-        </a>
-        
-        <!-- Login Form -->
-        <div class="login-card">
-            <h4>Sign in</h4>
-            
-            <!-- Alert Messages -->
-            <div class="alert alert-danger" id="errorAlert"></div>
-            <div class="alert alert-success" id="successAlert"></div>
-            <div class="alert alert-info" id="infoAlert">
-                <i class="bi bi-info-circle me-2"></i>
-                Demo credentials: <strong>demo@shopmart.com</strong> / <strong>demo123</strong>
-            </div>
-            
-            <!-- Login Form -->
-            <form id="loginForm" onsubmit="return false;">
-                <div class="mb-3">
-                    <label for="email" class="form-label">Email or mobile phone number</label>
-                    <input type="email" class="form-control" id="email" 
-                           placeholder="demo@shopmart.com" required autocomplete="email">
-                </div>
-                
-                <div class="mb-3">
-                    <div class="d-flex justify-content-between">
-                        <label for="password" class="form-label">Password</label>
-                        <a href="forgot-password.html" class="forgot-link">Forgot password?</a>
-                    </div>
-                    <input type="password" class="form-control" id="password" 
-                           placeholder="Enter password" required autocomplete="current-password">
-                </div>
-                
-                <div class="mb-3 form-check">
-                    <input type="checkbox" class="form-check-input" id="rememberMe">
-                    <label class="form-check-label" for="rememberMe" style="font-size:0.85rem;">
-                        Keep me signed in
-                    </label>
-                </div>
-                
-                <button type="submit" class="btn btn-signin mb-3" id="signInBtn">
-                    Sign in
-                </button>
-                
-                <p style="font-size:0.75rem;color:#555;line-height:1.5;">
-                    By continuing, you agree to ShopMart's 
-                    <a href="#" style="color:#0066c0;">Conditions of Use</a> and 
-                    <a href="#" style="color:#0066c0;">Privacy Notice</a>.
-                </p>
-            </form>
-            
-            <!-- Divider -->
-            <div class="divider">
-                <span>or sign in with</span>
-            </div>
-            
-            <!-- Social Login -->
-            <div class="social-login-section">
-                <button class="btn-social btn-google" onclick="handleSocialLogin('Google')">
-                    <i class="bi bi-google"></i>
-                    Continue with Google
-                </button>
-                
-                <button class="btn-social btn-facebook" onclick="handleSocialLogin('Facebook')">
-                    <i class="bi bi-facebook"></i>
-                    Continue with Facebook
-                </button>
-                
-                <button class="btn-social btn-github" onclick="handleSocialLogin('GitHub')">
-                    <i class="bi bi-github"></i>
-                    Continue with GitHub
-                </button>
-                
-                <button class="btn-social btn-microsoft" onclick="handleSocialLogin('Microsoft')">
-                    <i class="bi bi-microsoft"></i>
-                    Continue with Microsoft
-                </button>
-            </div>
-            
-            <!-- Create Account -->
-            <div class="divider mt-4">
-                <span>New to ShopMart?</span>
-            </div>
-            <div class="text-center">
-                <a href="signup.html" class="create-account-link">
-                    <i class="bi bi-person-plus me-1"></i>
-                    Create your ShopMart account
-                </a>
-            </div>
-        </div>
-        
-        <!-- Footer -->
-        <div class="text-center mt-3" style="font-size:0.8rem;">
-            <a href="#" style="color:#0066c0;text-decoration:none;margin:0 10px;">Conditions of Use</a>
-            <a href="#" style="color:#0066c0;text-decoration:none;margin:0 10px;">Privacy Notice</a>
-            <a href="#" style="color:#0066c0;text-decoration:none;margin:0 10px;">Help</a>
-        </div>
-        <p class="text-center text-muted mt-2" style="font-size:0.75rem;">
-            © 2024 ShopMart. All rights reserved.
-        </p>
+
+<header class="header-top">
+    <a href="../index.html" class="logo-brand">merkato<span class="dot">.</span>com</a>
+</header>
+
+<div class="auth-card">
+    <h4>Sign in</h4>
+
+    <div class="demo-hint">
+        <i class="bi bi-info-circle me-1"></i>
+        Demo credentials: <strong>demo@shopmart.com</strong> / <strong>demo123</strong>
     </div>
 
-    <!-- Bootstrap JS -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-    
-    <!-- Auth System -->
-    <script src="../assets/js/auth.js"></script>
-    
-    <!-- Login Logic -->
-    <script>
-        // Wait for auth system to initialize
-        window.addEventListener('DOMContentLoaded', () => {
-            // Check if already logged in
-            setTimeout(() => {
-                if (authSystem.isLoggedIn()) {
-                    window.location.href = '../index.html';
-                }
-            }, 500);
-        });
+    <!-- Error placeholder -->
+    <div id="loginError"></div>
 
-        // Handle form submission
-        document.getElementById('loginForm').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            
-            const email = document.getElementById('email').value.trim();
-            const password = document.getElementById('password').value;
-            const signInBtn = document.getElementById('signInBtn');
-            const errorAlert = document.getElementById('errorAlert');
-            const successAlert = document.getElementById('successAlert');
-            const infoAlert = document.getElementById('infoAlert');
-            
-            // Hide alerts
-            errorAlert.style.display = 'none';
-            successAlert.style.display = 'none';
-            
-            // Validation
-            if (!email || !password) {
-                showAlert(errorAlert, 'Please fill in all fields');
-                return;
-            }
-            
-            // Show loading state
-            signInBtn.disabled = true;
-            signInBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Signing in...';
-            
-            // Attempt login
-            const result = await authSystem.login(email, password);
-            
-            if (result.success) {
-                // Hide info alert
-                infoAlert.style.display = 'none';
-                
-                // Show success
-                showAlert(successAlert, result.message);
-                
-                // Redirect to home page
-                setTimeout(() => {
-                    window.location.href = '../index.html';
-                }, 1000);
-            } else {
-                // Show error
-                showAlert(errorAlert, result.message);
-                
-                // Reset button
-                signInBtn.disabled = false;
-                signInBtn.innerHTML = 'Sign in';
-                
-                // Clear password field
-                document.getElementById('password').value = '';
-            }
-        });
+    <form id="loginForm" novalidate>
+        <div class="mb-3">
+            <label class="form-label" for="loginEmail">Email or mobile phone number</label>
+            <input type="email" class="form-control" id="loginEmail" autocomplete="email" required>
+        </div>
+        <div class="mb-1">
+            <label class="form-label" for="loginPassword">Password</label>
+            <input type="password" class="form-control" id="loginPassword" autocomplete="current-password" required>
+        </div>
+        <div class="text-end mb-3">
+            <a href="forgot-password.html" class="forgot-link">Forgot password?</a>
+        </div>
+        <div class="form-check mb-3">
+            <input class="form-check-input" type="checkbox" id="keepSignedIn">
+            <label class="form-check-label" style="font-size:0.82rem;" for="keepSignedIn">Keep me signed in</label>
+        </div>
+        <button type="submit" class="btn-signin">Sign in</button>
+    </form>
 
-        // Social Login Handler
-        async function handleSocialLogin(provider) {
-            const result = await authSystem.socialLogin(provider);
-            
-            if (result.success) {
-                document.getElementById('infoAlert').style.display = 'none';
-                showAlert(document.getElementById('successAlert'), result.message);
-                
-                setTimeout(() => {
-                    window.location.href = '../index.html';
-                }, 1000);
-            }
-        }
+    <div class="divider">or sign in with</div>
 
-        // Helper: Show alert
-        function showAlert(element, message) {
-            element.textContent = message;
-            element.style.display = 'block';
-            
-            // Auto hide after 5 seconds
-            setTimeout(() => {
-                element.style.display = 'none';
-            }, 5000);
-        }
-        
-        // Keyboard shortcut: Enter to submit
-        document.addEventListener('keypress', (e) => {
-            if (e.key === 'Enter') {
-                document.getElementById('loginForm').dispatchEvent(new Event('submit'));
-            }
-        });
-    </script>
+    <button class="btn-social"><i class="bi bi-google" style="color:#EA4335;"></i> Continue with Google</button>
+    <button class="btn-social"><i class="bi bi-facebook" style="color:#1877F2;"></i> Continue with Facebook</button>
+    <button class="btn-social"><i class="bi bi-github"></i> Continue with GitHub</button>
+    <button class="btn-social"><i class="bi bi-microsoft" style="color:#00A4EF;"></i> Continue with Microsoft</button>
+
+    <div class="auth-footer">
+        New to Merkato?<br>
+        <a href="signup.html">Create your Merkato account</a>
+    </div>
+</div>
+
+<div class="page-footer">
+    <a href="#">Conditions of Use</a>
+    <a href="#">Privacy Notice</a>
+    <a href="#">Help</a>
+    <p class="mt-2 mb-0">© 2024 ShopMart. All rights reserved.</p>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<script src="../assets/js/auth.js"></script>
 </body>
 </html>
