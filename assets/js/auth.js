@@ -1,467 +1,220 @@
-// ============================================
-// ShopMart - Authentication System (Day 3 - Fixed)
-// Complete user management with wishlist & orders
-// ============================================
+/**
+ * Merkato Auth Module
+ * Handles: login, signup, session persistence, and header UI updates.
+ * Uses localStorage key: 'shopmart_user' = { name, email, phone }
+ */
 
-class AuthSystem {
-    constructor() {
-        this.currentUser = null;
-        this.users = [];
-        this.init();
+(function () {
+    'use strict';
+
+    /* ─── Constants ─────────────────────────────────────── */
+    const USER_KEY   = 'shopmart_user';
+    const DEMO_EMAIL = 'demo@shopmart.com';
+    const DEMO_PASS  = 'demo123';
+
+    /* ─── Helpers ───────────────────────────────────────── */
+    function getUser() {
+        try { return JSON.parse(localStorage.getItem(USER_KEY)); }
+        catch { return null; }
     }
 
-    async init() {
-        await this.loadUsers();
-        this.checkSession();
-        this.updateHeaderUI();
-        console.log('🔐 Auth System Initialized');
-        console.log('📝 Logged in:', this.isLoggedIn() ? 'Yes' : 'No');
+    function setUser(u) {
+        localStorage.setItem(USER_KEY, JSON.stringify(u));
     }
 
-    async loadUsers() {
-        try {
-            const response = await fetch('data/users.json');
-            if (!response.ok) throw new Error('Failed to load users');
-            const data = await response.json();
-            this.users = data.users;
-            console.log(`👥 Loaded ${this.users.length} users`);
-        } catch (error) {
-            console.warn('Could not load users.json, using demo data');
-            this.users = [
-                {
-                    id: 'user_demo',
-                    email: 'demo@shopmart.com',
-                    password: 'demo123',
-                    displayName: 'Demo User',
-                    avatar: null,
-                    phone: '',
-                    address: '',
-                    joinedDate: new Date().toISOString(),
-                    orders: [],
-                    wishlist: []
+    function clearUser() {
+        localStorage.removeItem(USER_KEY);
+    }
+
+    function isOnPage(name) {
+        return window.location.pathname.includes(name);
+    }
+
+    /* ─── Header Update ─────────────────────────────────── */
+    /**
+     * Call this on every page load.
+     * If logged in: update "Hello, Guest" → "Hello, Name"
+     *               "Account & Lists"     → links to account.html
+     *               "Returns & Orders"    → links to orders.html
+     * If logged out: show login link (default).
+     */
+    function updateHeader() {
+        const user = getUser();
+
+        // Determine path prefix (root vs pages/ subfolder)
+        const inPages = window.location.pathname.includes('/pages/');
+        const prefix  = inPages ? '' : 'pages/';
+
+        /* --- Account link element --- */
+        const accountLink = document.querySelector('a[href*="login.html"], a[href*="account.html"]');
+        /* --- Orders link element --- */
+        const ordersLink = document.querySelector('a[href*="Orders"], a[href*="orders.html"], .header-link:not([href*="login"])');
+
+        if (user) {
+            const firstName = (user.name || 'User').split(' ')[0];
+
+            // Update account link
+            if (accountLink) {
+                accountLink.href = prefix + 'account.html';
+                accountLink.innerHTML = `
+                    Hello, ${escapeHtml(firstName)}
+                    <span class="link-title">Account &amp; Lists <i class="bi bi-chevron-down" style="font-size:0.6rem;"></i></span>
+                `;
+            }
+
+            // Update orders link — it's the sibling "Returns & Orders" anchor
+            const allHeaderLinks = document.querySelectorAll('.header-link, a.header-link');
+            allHeaderLinks.forEach(el => {
+                if (el.textContent.includes('Orders') || el.textContent.includes('Returns')) {
+                    el.href = prefix + 'orders.html';
                 }
-            ];
-        }
-    }
+            });
 
-// Update checkSession to be more robust
-checkSession() {
-    const sessionData = localStorage.getItem('shopmart_session');
-    if (sessionData) {
-        try {
-            const session = JSON.parse(sessionData);
-            const now = new Date().getTime();
-            const sessionAge = now - (session.timestamp || 0);
-            const maxAge = 7 * 24 * 60 * 60 * 1000; // 7 days instead of 24 hours
-
-            if (sessionAge < maxAge && session.user) {
-                this.currentUser = session.user;
-                console.log('👤 Session restored for:', this.currentUser.displayName);
-                return true;
-            } else {
-                // Session expired
-                this.logout(true);
-                console.log('⏰ Session expired');
-                return false;
+        } else {
+            // Ensure account link points back to login
+            if (accountLink && !accountLink.href.includes('login.html')) {
+                accountLink.href = prefix + 'login.html';
+                accountLink.innerHTML = `
+                    Hello, Guest
+                    <span class="link-title">Account &amp; Lists <i class="bi bi-chevron-down" style="font-size:0.6rem;"></i></span>
+                `;
             }
-        } catch (error) {
-            console.error('Session parse error:', error);
-            this.logout(true);
-            return false;
-        }
-    }
-    return false;
-}
-            // Add this method right after checkSession()
-isReady() {
-    return this.users.length > 0;
-} 
-
-    async login(email, password) {
-        try {
-            const user = this.users.find(u => u.email.toLowerCase() === email.toLowerCase());
-            
-            if (!user) {
-                throw new Error('No account found with this email address');
-            }
-
-            if (user.password !== password) {
-                throw new Error('Incorrect password');
-            }
-
-            // 🆕 Merge localStorage wishlist with user wishlist
-            const localWishlist = JSON.parse(localStorage.getItem('shopmart_wishlist') || '[]');
-            const mergedWishlist = [...new Set([...user.wishlist, ...localWishlist])];
-
-            const userData = {
-                id: user.id,
-                email: user.email,
-                displayName: user.displayName,
-                avatar: user.avatar || null,
-                phone: user.phone || '',
-                address: user.address || '',
-                joinedDate: user.joinedDate,
-                wishlist: mergedWishlist,
-                orders: JSON.parse(localStorage.getItem('shopmart_orders') || '[]')
-            };
-
-            this.currentUser = userData;
-            this.saveSession(userData);
-            this.updateHeaderUI();
-            
-            // Sync localStorage
-            localStorage.setItem('shopmart_wishlist', JSON.stringify(mergedWishlist));
-
-            return {
-                success: true,
-                message: `Welcome back, ${userData.displayName}!`,
-                user: userData
-            };
-
-        } catch (error) {
-            return {
-                success: false,
-                message: error.message
-            };
         }
     }
 
-    async signup(userData) {
-        try {
-            if (!this.isValidEmail(userData.email)) {
-                throw new Error('Please enter a valid email address');
-            }
-
-            const existingUser = this.users.find(u => u.email.toLowerCase() === userData.email.toLowerCase());
-            if (existingUser) {
-                throw new Error('An account with this email already exists');
-            }
-
-            if (userData.password.length < 6) {
-                throw new Error('Password must be at least 6 characters');
-            }
-
-            // 🆕 Get existing localStorage data
-            const existingWishlist = JSON.parse(localStorage.getItem('shopmart_wishlist') || '[]');
-            const existingOrders = JSON.parse(localStorage.getItem('shopmart_orders') || '[]');
-            const existingCart = JSON.parse(localStorage.getItem('shopmart_cart') || '[]');
-
-            const newUser = {
-                id: 'user_' + Date.now(),
-                email: userData.email,
-                password: userData.password,
-                displayName: userData.displayName || userData.email.split('@')[0],
-                phone: userData.phone || '',
-                address: userData.address || '',
-                avatar: null,
-                joinedDate: new Date().toISOString().split('T')[0],
-                orders: existingOrders,
-                wishlist: existingWishlist
-            };
-
-            this.users.push(newUser);
-
-            const loginData = {
-                id: newUser.id,
-                email: newUser.email,
-                displayName: newUser.displayName,
-                avatar: null,
-                phone: newUser.phone,
-                address: newUser.address,
-                joinedDate: newUser.joinedDate,
-                wishlist: existingWishlist,
-                orders: existingOrders
-            };
-
-            this.currentUser = loginData;
-            this.saveSession(loginData);
-            this.updateHeaderUI();
-
-            return {
-                success: true,
-                message: `Welcome to ShopMart, ${newUser.displayName}!`,
-                user: loginData
-            };
-
-        } catch (error) {
-            return {
-                success: false,
-                message: error.message
-            };
-        }
+    function escapeHtml(str) {
+        return str.replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
     }
 
-    // 🆕 Add to wishlist
-    addToWishlist(productId) {
-        if (!this.currentUser) return false;
-        
-        if (!this.currentUser.wishlist) {
-            this.currentUser.wishlist = [];
-        }
-        
-        if (!this.currentUser.wishlist.includes(productId)) {
-            this.currentUser.wishlist.push(productId);
-            this.saveSession(this.currentUser);
-            localStorage.setItem('shopmart_wishlist', JSON.stringify(this.currentUser.wishlist));
-            return true;
-        }
-        return false;
-    }
+    /* ─── Login Page Logic ──────────────────────────────── */
+    function initLoginPage() {
+        const form     = document.getElementById('loginForm');
+        const emailEl  = document.getElementById('loginEmail');
+        const passEl   = document.getElementById('loginPassword');
+        const errEl    = document.getElementById('loginError');
 
-    // 🆕 Remove from wishlist
-    removeFromWishlist(productId) {
-        if (!this.currentUser) return false;
-        
-        if (this.currentUser.wishlist) {
-            this.currentUser.wishlist = this.currentUser.wishlist.filter(id => id !== productId);
-            this.saveSession(this.currentUser);
-            localStorage.setItem('shopmart_wishlist', JSON.stringify(this.currentUser.wishlist));
-            return true;
-        }
-        return false;
-    }
+        if (!form) return;
 
-    // 🆕 Get wishlist
-    getWishlist() {
-        return this.currentUser ? (this.currentUser.wishlist || []) : [];
-    }
-
-    // 🆕 Add order
-    addOrder(orderData) {
-        if (!this.currentUser) return false;
-        
-        if (!this.currentUser.orders) {
-            this.currentUser.orders = [];
-        }
-        
-        const order = {
-            id: 'ORD' + Date.now(),
-            date: new Date().toISOString(),
-            items: orderData.items,
-            total: orderData.total,
-            status: 'Processing'
-        };
-        
-        this.currentUser.orders.unshift(order);
-        this.saveSession(this.currentUser);
-        localStorage.setItem('shopmart_orders', JSON.stringify(this.currentUser.orders));
-        return order;
-    }
-
-    // 🆕 Get orders
-    getOrders() {
-        return this.currentUser ? (this.currentUser.orders || []) : [];
-    }
-
-    async socialLogin(provider) {
-        const existingWishlist = JSON.parse(localStorage.getItem('shopmart_wishlist') || '[]');
-        
-        const demoUser = {
-            id: 'social_' + Date.now(),
-            email: `demo@${provider.toLowerCase()}.com`,
-            displayName: `${provider} User`,
-            avatar: this.getProviderIcon(provider),
-            phone: '',
-            address: '',
-            joinedDate: new Date().toISOString().split('T')[0],
-            wishlist: existingWishlist,
-            orders: []
-        };
-
-        this.currentUser = demoUser;
-        this.saveSession(demoUser);
-        this.updateHeaderUI();
-
-        return {
-            success: true,
-            message: `Welcome, ${demoUser.displayName}!`,
-            user: demoUser
-        };
-    }
-
-    logout(silent = false) {
-        this.currentUser = null;
-        localStorage.removeItem('shopmart_session');
-        this.updateHeaderUI();
-        
-        if (!silent) {
-            alert('You have been logged out successfully.');
-            window.location.href = 'index.html';
-        }
-    }
-
-    isLoggedIn() {
-        return this.currentUser !== null;
-    }
-
-    getCurrentUser() {
-        return this.currentUser;
-    }
-
-    saveSession(userData) {
-        const session = {
-            user: userData,
-            timestamp: new Date().getTime()
-        };
-        localStorage.setItem('shopmart_session', JSON.stringify(session));
-    }
-
-    updateProfile(updates) {
-        if (!this.currentUser) return false;
-
-        Object.assign(this.currentUser, updates);
-        
-        const userIndex = this.users.findIndex(u => u.id === this.currentUser.id);
-        if (userIndex !== -1) {
-            Object.assign(this.users[userIndex], updates);
+        // If already logged in, skip login page
+        if (getUser()) {
+            window.location.href = 'account.html';
+            return;
         }
 
-        this.saveSession(this.currentUser);
-        this.updateHeaderUI();
-
-        return true;
-    }
-
-    syncWishlist(wishlistItems) {
-        if (wishlistItems && wishlistItems.length > 0) {
-            localStorage.setItem('shopmart_wishlist', JSON.stringify(wishlistItems));
-        }
-    }
-
-    updateHeaderUI() {
-        const accountLinks = document.querySelectorAll('.header-link');
-        
-        accountLinks.forEach(link => {
-            if (link.querySelector('.link-title') && 
-                (link.textContent.includes('Account') || link.textContent.includes('Sign In'))) {
-                
-                if (this.currentUser) {
-                    const avatar = this.currentUser.avatar 
-                        ? `<img src="${this.currentUser.avatar}" style="width:24px;height:24px;border-radius:50%;margin-right:4px;vertical-align:middle;">` 
-                        : '<i class="bi bi-person-circle me-1"></i>';
-                    
-                    link.innerHTML = `
-                        Hello, ${this.currentUser.displayName.split(' ')[0]}
-                        <span class="link-title">
-                            ${avatar}
-                            Account & Lists 
-                            <i class="bi bi-chevron-down" style="font-size:0.6rem;"></i>
-                        </span>
-                    `;
-                    link.href = 'pages/account.html';
-                    link.onclick = null;
-                    
-                    this.createAccountDropdown(link);
-                } else {
-                    link.innerHTML = `
-                        Hello, Sign in
-                        <span class="link-title">Account & Lists <i class="bi bi-chevron-down" style="font-size:0.6rem;"></i></span>
-                    `;
-                    link.href = 'pages/login.html';
-                    link.onclick = null;
-                }
-            }
-        });
-    }
-
-    createAccountDropdown(linkElement) {
-        const existingDropdown = document.querySelector('.account-dropdown');
-        if (existingDropdown) existingDropdown.remove();
-
-        const dropdown = document.createElement('div');
-        dropdown.className = 'account-dropdown';
-        dropdown.style.cssText = `
-            display: none;
-            position: absolute;
-            top: 100%;
-            right: 0;
-            background: white;
-            min-width: 200px;
-            box-shadow: 0 8px 25px rgba(0,0,0,0.2);
-            border-radius: 8px;
-            z-index: 1000;
-            padding: 8px 0;
-        `;
-
-        dropdown.innerHTML = `
-            <div style="padding: 12px 16px; border-bottom: 1px solid #eee;">
-                <strong>${this.currentUser.displayName}</strong>
-                <br>
-                <small class="text-muted">${this.currentUser.email}</small>
-            </div>
-            <a href="pages/account.html" class="dropdown-item" style="display:block;padding:8px 16px;color:#333;text-decoration:none;">
-                <i class="bi bi-person me-2"></i> Your Account
-            </a>
-            <a href="pages/account.html#orders" class="dropdown-item" style="display:block;padding:8px 16px;color:#333;text-decoration:none;">
-                <i class="bi bi-box me-2"></i> Your Orders
-            </a>
-            <a href="#" class="dropdown-item" style="display:block;padding:8px 16px;color:#333;text-decoration:none;" onclick="event.preventDefault(); window.location.href='pages/account.html#wishlist'">
-                <i class="bi bi-heart me-2"></i> Wishlist
-            </a>
-            <div style="border-top: 1px solid #eee; margin-top: 8px; padding-top: 8px;">
-                <a href="#" class="dropdown-item text-danger" style="display:block;padding:8px 16px;text-decoration:none;" onclick="event.preventDefault(); authSystem.logout();">
-                    <i class="bi bi-box-arrow-right me-2"></i> Sign Out
-                </a>
-            </div>
-        `;
-
-        linkElement.parentElement.style.position = 'relative';
-        linkElement.parentElement.appendChild(dropdown);
-
-        linkElement.addEventListener('click', (e) => {
+        form.addEventListener('submit', function (e) {
             e.preventDefault();
-            dropdown.style.display = dropdown.style.display === 'block' ? 'none' : 'block';
-        });
+            const email = emailEl.value.trim();
+            const pass  = passEl.value;
 
-        document.addEventListener('click', (e) => {
-            if (!linkElement.contains(e.target) && !dropdown.contains(e.target)) {
-                dropdown.style.display = 'none';
+            if (!email || !pass) {
+                showError(errEl, 'Please fill in all fields.');
+                return;
+            }
+
+            // Check demo credentials
+            if (email === DEMO_EMAIL && pass === DEMO_PASS) {
+                setUser({ name: 'Demo User', email: DEMO_EMAIL });
+                redirectAfterAuth();
+                return;
+            }
+
+            // Check stored registered users
+            const users = JSON.parse(localStorage.getItem('shopmart_users') || '[]');
+            const match = users.find(u => u.email === email && u.password === pass);
+            if (match) {
+                setUser({ name: match.name, email: match.email, phone: match.phone || '' });
+                redirectAfterAuth();
+            } else {
+                showError(errEl, 'Incorrect email or password. <a href="forgot-password.html">Forgot password?</a>');
             }
         });
     }
 
-    requireAuth(redirectUrl = 'pages/login.html') {
-        if (!this.isLoggedIn()) {
-            window.location.href = redirectUrl;
-            return false;
+    /* ─── Signup Page Logic ─────────────────────────────── */
+    function initSignupPage() {
+        const form     = document.getElementById('signupForm');
+        const nameEl   = document.getElementById('signupName');
+        const emailEl  = document.getElementById('signupEmail');
+        const phoneEl  = document.getElementById('signupPhone');
+        const passEl   = document.getElementById('signupPassword');
+        const pass2El  = document.getElementById('signupPassword2');
+        const errEl    = document.getElementById('signupError');
+
+        if (!form) return;
+
+        if (getUser()) {
+            window.location.href = 'account.html';
+            return;
         }
-        return true;
+
+        form.addEventListener('submit', function (e) {
+            e.preventDefault();
+
+            const name  = nameEl ? nameEl.value.trim() : '';
+            const email = emailEl ? emailEl.value.trim() : '';
+            const phone = phoneEl ? phoneEl.value.trim() : '';
+            const pass  = passEl ? passEl.value : '';
+            const pass2 = pass2El ? pass2El.value : '';
+
+            if (!name || !email || !pass) {
+                showError(errEl, 'Please fill in all required fields.');
+                return;
+            }
+            if (pass.length < 6) {
+                showError(errEl, 'Password must be at least 6 characters.');
+                return;
+            }
+            if (pass !== pass2) {
+                showError(errEl, 'Passwords do not match.');
+                return;
+            }
+
+            // Check duplicate email
+            const users = JSON.parse(localStorage.getItem('shopmart_users') || '[]');
+            if (users.find(u => u.email === email)) {
+                showError(errEl, 'An account with that email already exists. <a href="login.html">Sign in</a>');
+                return;
+            }
+
+            // Store new user
+            users.push({ name, email, phone, password: pass });
+            localStorage.setItem('shopmart_users', JSON.stringify(users));
+
+            // Log them in immediately
+            setUser({ name, email, phone });
+            redirectAfterAuth();
+        });
     }
 
-    isValidEmail(email) {
-        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-        return emailRegex.test(email);
-    }
-
-    getProviderIcon(provider) {
-        const icons = {
-            'Google': 'https://img.icons8.com/color/48/google-logo.png',
-            'Facebook': 'https://img.icons8.com/color/48/facebook.png',
-            'GitHub': 'https://img.icons8.com/ios-glyphs/48/github.png',
-            'Microsoft': 'https://img.icons8.com/color/48/microsoft.png',
-            'Twitter': 'https://img.icons8.com/color/48/twitter.png'
-        };
-        return icons[provider] || null;
-    }
-
-    async forgotPassword(email) {
-        const user = this.users.find(u => u.email.toLowerCase() === email.toLowerCase());
-        if (!user) {
-            return {
-                success: false,
-                message: 'No account found with this email address'
-            };
+    /* ─── Redirect after successful auth ───────────────── */
+    function redirectAfterAuth() {
+        const params   = new URLSearchParams(window.location.search);
+        const redirect = params.get('redirect');
+        if (redirect) {
+            window.location.href = redirect;
+        } else {
+            window.location.href = 'account.html';
         }
-        
-        return {
-            success: true,
-            message: `Password reset link sent to ${email}. (Demo: password is "${user.password}")`
-        };
     }
-}
 
-// Create global auth instance
-const authSystem = new AuthSystem();
+    /* ─── Error display helper ──────────────────────────── */
+    function showError(el, msg) {
+        if (!el) return;
+        el.innerHTML = `<div class="alert alert-danger py-2 mb-0" role="alert">${msg}</div>`;
+    }
 
-// Export for use in other modules
-window.authSystem = authSystem;
+    /* ─── Sign-out global helper ────────────────────────── */
+    window.shopMartSignOut = function () {
+        clearUser();
+        window.location.href = window.location.pathname.includes('/pages/') ? '../index.html' : 'index.html';
+    };
+
+    /* ─── Bootstrap ─────────────────────────────────────── */
+    document.addEventListener('DOMContentLoaded', function () {
+        updateHeader();
+
+        if (isOnPage('login.html'))  initLoginPage();
+        if (isOnPage('signup.html')) initSignupPage();
+    });
+
+})();
