@@ -44,27 +44,38 @@ class AuthSystem {
         }
     }
 
-    checkSession() {
-        const sessionData = localStorage.getItem('shopmart_session');
-        if (sessionData) {
-            try {
-                const session = JSON.parse(sessionData);
-                const now = new Date().getTime();
-                const sessionAge = now - session.timestamp;
-                const maxAge = 24 * 60 * 60 * 1000;
+// Update checkSession to be more robust
+checkSession() {
+    const sessionData = localStorage.getItem('shopmart_session');
+    if (sessionData) {
+        try {
+            const session = JSON.parse(sessionData);
+            const now = new Date().getTime();
+            const sessionAge = now - (session.timestamp || 0);
+            const maxAge = 7 * 24 * 60 * 60 * 1000; // 7 days instead of 24 hours
 
-                if (sessionAge < maxAge) {
-                    this.currentUser = session.user;
-                    console.log('👤 Session restored for:', this.currentUser.displayName);
-                } else {
-                    this.logout(true);
-                    console.log('⏰ Session expired, please login again');
-                }
-            } catch (error) {
+            if (sessionAge < maxAge && session.user) {
+                this.currentUser = session.user;
+                console.log('👤 Session restored for:', this.currentUser.displayName);
+                return true;
+            } else {
+                // Session expired
                 this.logout(true);
+                console.log('⏰ Session expired');
+                return false;
             }
+        } catch (error) {
+            console.error('Session parse error:', error);
+            this.logout(true);
+            return false;
         }
     }
+    return false;
+}
+            // Add this method right after checkSession()
+isReady() {
+    return this.users.length > 0;
+} 
 
     async login(email, password) {
         try {
