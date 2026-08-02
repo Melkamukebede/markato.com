@@ -1,6 +1,6 @@
 // ============================================
-// ShopMart - Authentication System (Day 3)
-// Complete user management with session handling
+// ShopMart - Authentication System (Day 3 - Fixed)
+// Complete user management with wishlist & orders
 // ============================================
 
 class AuthSystem {
@@ -10,22 +10,14 @@ class AuthSystem {
         this.init();
     }
 
-    // Initialize auth system
     async init() {
-        // Load users from JSON
         await this.loadUsers();
-        
-        // Check for existing session
         this.checkSession();
-        
-        // Update UI
         this.updateHeaderUI();
-        
         console.log('🔐 Auth System Initialized');
         console.log('📝 Logged in:', this.isLoggedIn() ? 'Yes' : 'No');
     }
 
-    // Load users from JSON file
     async loadUsers() {
         try {
             const response = await fetch('data/users.json');
@@ -35,7 +27,6 @@ class AuthSystem {
             console.log(`👥 Loaded ${this.users.length} users`);
         } catch (error) {
             console.warn('Could not load users.json, using demo data');
-            // Fallback demo users
             this.users = [
                 {
                     id: 'user_demo',
@@ -43,6 +34,8 @@ class AuthSystem {
                     password: 'demo123',
                     displayName: 'Demo User',
                     avatar: null,
+                    phone: '',
+                    address: '',
                     joinedDate: new Date().toISOString(),
                     orders: [],
                     wishlist: []
@@ -51,22 +44,19 @@ class AuthSystem {
         }
     }
 
-    // Check if user has active session
     checkSession() {
         const sessionData = localStorage.getItem('shopmart_session');
         if (sessionData) {
             try {
                 const session = JSON.parse(sessionData);
-                // Verify session is not expired (24 hours)
                 const now = new Date().getTime();
                 const sessionAge = now - session.timestamp;
-                const maxAge = 24 * 60 * 60 * 1000; // 24 hours
+                const maxAge = 24 * 60 * 60 * 1000;
 
                 if (sessionAge < maxAge) {
                     this.currentUser = session.user;
                     console.log('👤 Session restored for:', this.currentUser.displayName);
                 } else {
-                    // Session expired
                     this.logout(true);
                     console.log('⏰ Session expired, please login again');
                 }
@@ -76,22 +66,22 @@ class AuthSystem {
         }
     }
 
-    // Login with email and password
     async login(email, password) {
         try {
-            // Find user by email
             const user = this.users.find(u => u.email.toLowerCase() === email.toLowerCase());
             
             if (!user) {
                 throw new Error('No account found with this email address');
             }
 
-            // Check password
             if (user.password !== password) {
                 throw new Error('Incorrect password');
             }
 
-            // Login successful
+            // 🆕 Merge localStorage wishlist with user wishlist
+            const localWishlist = JSON.parse(localStorage.getItem('shopmart_wishlist') || '[]');
+            const mergedWishlist = [...new Set([...user.wishlist, ...localWishlist])];
+
             const userData = {
                 id: user.id,
                 email: user.email,
@@ -100,20 +90,16 @@ class AuthSystem {
                 phone: user.phone || '',
                 address: user.address || '',
                 joinedDate: user.joinedDate,
-                wishlist: user.wishlist || []
+                wishlist: mergedWishlist,
+                orders: JSON.parse(localStorage.getItem('shopmart_orders') || '[]')
             };
 
-            // Save to current session
             this.currentUser = userData;
-            
-            // Save session to localStorage
             this.saveSession(userData);
-            
-            // Update UI
             this.updateHeaderUI();
             
-            // Sync wishlist with user's saved wishlist
-            this.syncWishlist(userData.wishlist);
+            // Sync localStorage
+            localStorage.setItem('shopmart_wishlist', JSON.stringify(mergedWishlist));
 
             return {
                 success: true,
@@ -129,26 +115,26 @@ class AuthSystem {
         }
     }
 
-    // Register new user
     async signup(userData) {
         try {
-            // Validate email
             if (!this.isValidEmail(userData.email)) {
                 throw new Error('Please enter a valid email address');
             }
 
-            // Check if email already exists
             const existingUser = this.users.find(u => u.email.toLowerCase() === userData.email.toLowerCase());
             if (existingUser) {
                 throw new Error('An account with this email already exists');
             }
 
-            // Validate password
             if (userData.password.length < 6) {
                 throw new Error('Password must be at least 6 characters');
             }
 
-            // Create new user
+            // 🆕 Get existing localStorage data
+            const existingWishlist = JSON.parse(localStorage.getItem('shopmart_wishlist') || '[]');
+            const existingOrders = JSON.parse(localStorage.getItem('shopmart_orders') || '[]');
+            const existingCart = JSON.parse(localStorage.getItem('shopmart_cart') || '[]');
+
             const newUser = {
                 id: 'user_' + Date.now(),
                 email: userData.email,
@@ -157,15 +143,13 @@ class AuthSystem {
                 phone: userData.phone || '',
                 address: userData.address || '',
                 avatar: null,
-                joinedDate: new Date().toISOString(),
-                orders: [],
-                wishlist: []
+                joinedDate: new Date().toISOString().split('T')[0],
+                orders: existingOrders,
+                wishlist: existingWishlist
             };
 
-            // Add to users array
             this.users.push(newUser);
 
-            // Auto login after signup
             const loginData = {
                 id: newUser.id,
                 email: newUser.email,
@@ -174,7 +158,8 @@ class AuthSystem {
                 phone: newUser.phone,
                 address: newUser.address,
                 joinedDate: newUser.joinedDate,
-                wishlist: []
+                wishlist: existingWishlist,
+                orders: existingOrders
             };
 
             this.currentUser = loginData;
@@ -195,8 +180,71 @@ class AuthSystem {
         }
     }
 
-    // Social login (simulated)
+    // 🆕 Add to wishlist
+    addToWishlist(productId) {
+        if (!this.currentUser) return false;
+        
+        if (!this.currentUser.wishlist) {
+            this.currentUser.wishlist = [];
+        }
+        
+        if (!this.currentUser.wishlist.includes(productId)) {
+            this.currentUser.wishlist.push(productId);
+            this.saveSession(this.currentUser);
+            localStorage.setItem('shopmart_wishlist', JSON.stringify(this.currentUser.wishlist));
+            return true;
+        }
+        return false;
+    }
+
+    // 🆕 Remove from wishlist
+    removeFromWishlist(productId) {
+        if (!this.currentUser) return false;
+        
+        if (this.currentUser.wishlist) {
+            this.currentUser.wishlist = this.currentUser.wishlist.filter(id => id !== productId);
+            this.saveSession(this.currentUser);
+            localStorage.setItem('shopmart_wishlist', JSON.stringify(this.currentUser.wishlist));
+            return true;
+        }
+        return false;
+    }
+
+    // 🆕 Get wishlist
+    getWishlist() {
+        return this.currentUser ? (this.currentUser.wishlist || []) : [];
+    }
+
+    // 🆕 Add order
+    addOrder(orderData) {
+        if (!this.currentUser) return false;
+        
+        if (!this.currentUser.orders) {
+            this.currentUser.orders = [];
+        }
+        
+        const order = {
+            id: 'ORD' + Date.now(),
+            date: new Date().toISOString(),
+            items: orderData.items,
+            total: orderData.total,
+            status: 'Processing'
+        };
+        
+        this.currentUser.orders.unshift(order);
+        this.saveSession(this.currentUser);
+        localStorage.setItem('shopmart_orders', JSON.stringify(this.currentUser.orders));
+        return order;
+    }
+
+    // 🆕 Get orders
+    getOrders() {
+        return this.currentUser ? (this.currentUser.orders || []) : [];
+    }
+
     async socialLogin(provider) {
+        const existingWishlist = JSON.parse(localStorage.getItem('shopmart_wishlist') || '[]');
+        
         const demoUser = {
             id: 'social_' + Date.now(),
             email: `demo@${provider.toLowerCase()}.com`,
@@ -204,8 +252,9 @@ class AuthSystem {
             avatar: this.getProviderIcon(provider),
             phone: '',
             address: '',
-            joinedDate: new Date().toISOString(),
-            wishlist: []
+            joinedDate: new Date().toISOString().split('T')[0],
+            wishlist: existingWishlist,
+            orders: []
         };
 
         this.currentUser = demoUser;
@@ -219,7 +268,6 @@ class AuthSystem {
         };
     }
 
-    // Logout
     logout(silent = false) {
         this.currentUser = null;
         localStorage.removeItem('shopmart_session');
@@ -231,17 +279,14 @@ class AuthSystem {
         }
     }
 
-    // Check if user is logged in
     isLoggedIn() {
         return this.currentUser !== null;
     }
 
-    // Get current user
     getCurrentUser() {
         return this.currentUser;
     }
 
-    // Save session to localStorage
     saveSession(userData) {
         const session = {
             user: userData,
@@ -250,34 +295,28 @@ class AuthSystem {
         localStorage.setItem('shopmart_session', JSON.stringify(session));
     }
 
-    // Update user profile
     updateProfile(updates) {
         if (!this.currentUser) return false;
 
-        // Update current user object
         Object.assign(this.currentUser, updates);
         
-        // Update in users array
         const userIndex = this.users.findIndex(u => u.id === this.currentUser.id);
         if (userIndex !== -1) {
             Object.assign(this.users[userIndex], updates);
         }
 
-        // Save updated session
         this.saveSession(this.currentUser);
         this.updateHeaderUI();
 
         return true;
     }
 
-    // Sync wishlist with user account
     syncWishlist(wishlistItems) {
         if (wishlistItems && wishlistItems.length > 0) {
             localStorage.setItem('shopmart_wishlist', JSON.stringify(wishlistItems));
         }
     }
 
-    // Update header UI
     updateHeaderUI() {
         const accountLinks = document.querySelectorAll('.header-link');
         
@@ -287,7 +326,7 @@ class AuthSystem {
                 
                 if (this.currentUser) {
                     const avatar = this.currentUser.avatar 
-                        ? `<img src="${this.currentUser.avatar}" class="user-avatar-mini" style="width:24px;height:24px;border-radius:50%;margin-right:4px;vertical-align:middle;">` 
+                        ? `<img src="${this.currentUser.avatar}" style="width:24px;height:24px;border-radius:50%;margin-right:4px;vertical-align:middle;">` 
                         : '<i class="bi bi-person-circle me-1"></i>';
                     
                     link.innerHTML = `
@@ -301,7 +340,6 @@ class AuthSystem {
                     link.href = 'pages/account.html';
                     link.onclick = null;
                     
-                    // Add dropdown menu
                     this.createAccountDropdown(link);
                 } else {
                     link.innerHTML = `
@@ -315,13 +353,10 @@ class AuthSystem {
         });
     }
 
-    // Create account dropdown menu
     createAccountDropdown(linkElement) {
-        // Remove existing dropdown if any
         const existingDropdown = document.querySelector('.account-dropdown');
         if (existingDropdown) existingDropdown.remove();
 
-        // Create dropdown
         const dropdown = document.createElement('div');
         dropdown.className = 'account-dropdown';
         dropdown.style.cssText = `
@@ -349,7 +384,7 @@ class AuthSystem {
             <a href="pages/account.html#orders" class="dropdown-item" style="display:block;padding:8px 16px;color:#333;text-decoration:none;">
                 <i class="bi bi-box me-2"></i> Your Orders
             </a>
-            <a href="#" class="dropdown-item" style="display:block;padding:8px 16px;color:#333;text-decoration:none;" onclick="event.preventDefault(); window.location.href='index.html'">
+            <a href="#" class="dropdown-item" style="display:block;padding:8px 16px;color:#333;text-decoration:none;" onclick="event.preventDefault(); window.location.href='pages/account.html#wishlist'">
                 <i class="bi bi-heart me-2"></i> Wishlist
             </a>
             <div style="border-top: 1px solid #eee; margin-top: 8px; padding-top: 8px;">
@@ -359,17 +394,14 @@ class AuthSystem {
             </div>
         `;
 
-        // Position relative to parent
         linkElement.parentElement.style.position = 'relative';
         linkElement.parentElement.appendChild(dropdown);
 
-        // Toggle dropdown on click
         linkElement.addEventListener('click', (e) => {
             e.preventDefault();
             dropdown.style.display = dropdown.style.display === 'block' ? 'none' : 'block';
         });
 
-        // Close dropdown when clicking outside
         document.addEventListener('click', (e) => {
             if (!linkElement.contains(e.target) && !dropdown.contains(e.target)) {
                 dropdown.style.display = 'none';
@@ -377,7 +409,6 @@ class AuthSystem {
         });
     }
 
-    // Require login to access page
     requireAuth(redirectUrl = 'pages/login.html') {
         if (!this.isLoggedIn()) {
             window.location.href = redirectUrl;
@@ -386,7 +417,6 @@ class AuthSystem {
         return true;
     }
 
-    // Utility functions
     isValidEmail(email) {
         const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
         return emailRegex.test(email);
@@ -403,7 +433,6 @@ class AuthSystem {
         return icons[provider] || null;
     }
 
-    // Simulate password reset
     async forgotPassword(email) {
         const user = this.users.find(u => u.email.toLowerCase() === email.toLowerCase());
         if (!user) {
