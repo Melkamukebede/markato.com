@@ -331,7 +331,60 @@ function toggleWishlist(productId) {
             link.classList.add('active');
         });
     });
+// 🆕 Place order function (add to app.js)
+function placeOrder() {
+    if (!window.authSystem || !authSystem.isLoggedIn()) {
+        alert('Please login to place an order');
+        window.location.href = 'pages/login.html';
+        return;
+    }
+    
+    if (cart.length === 0) {
+        alert('Your cart is empty');
+        return;
+    }
+    
+    const orderItems = cart.map(item => {
+        const product = products.find(p => p.id === item.productId);
+        return {
+            productId: item.productId,
+            name: product ? product.name : 'Unknown Product',
+            price: product ? product.price : 0,
+            quantity: item.quantity
+        };
+    });
+    
+    const total = getCartTotal();
+    
+    const order = authSystem.addOrder({
+        items: orderItems,
+        total: total
+    });
+    
+    if (order) {
+        // Clear cart
+        cart = [];
+        saveCart();
+        updateCartUI();
+        renderCartItems();
+        
+        // Close cart offcanvas if open
+        const offcanvas = bootstrap.Offcanvas.getInstance(document.getElementById('cartOffcanvas'));
+        if (offcanvas) offcanvas.hide();
+        
+        showToast('🎉 Order placed successfully!');
+        
+        // Redirect to orders page
+        setTimeout(() => {
+            window.location.href = 'pages/account.html#orders';
+        }, 1500);
+    }
+}
 
+// Update the checkout button in renderCartItems()
+// Find: <button class="btn-checkout" onclick="alert('Checkout will be implemented on Day 4!')">
+// Replace with:
+// <button class="btn-checkout" onclick="placeOrder()">Proceed to Checkout</button>
     // ========== TOAST NOTIFICATIONS ==========
     function showToast(message) {
         const toast = document.createElement('div');
